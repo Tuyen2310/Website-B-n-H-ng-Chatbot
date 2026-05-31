@@ -1,0 +1,47 @@
+{
+  "general": {
+    "shopName": "CommercePro Elite",
+    "tagline": "Trải nghiệm mua sắm thông minh cùng AI",
+    "email": "support@commercepro.vn",
+    "phone": "0988.123.456",
+    "address": "Số 123 Đường Láng, Đống Đa, Hà Nội",
+    "currency": "VND",
+    "facebook": "https://www.facebook.com/hoangtuyen.2310",
+    "instagram": "@another.tuyen",
+    "twitter": "twitter.com/commercepro",
+    "banner": "http://localhost:3001/uploads/5b897e50e4aed1d8e10a9c610107fcea1054.png",
+    "favicon": "http://localhost:3001/uploads/106f081355a1bda970eaeff9ef95578b0.jpg",
+    "logo": "http://localhost:3001/uploads/6f4cfc0b471b489a284963db4e7510d5a.jpg"
+  },
+  "seo": {
+    "metaTitle": "CommercePro - Hệ thống thương mại điện tử tích hợp AI",
+    "metaDescription": "Khám phá hàng ngàn sản phẩm chất lượng cao với sự hỗ trợ của Chatbot thông minh 24/7.",
+    "keywords": "ecommerce, ai chatbot, smart shopping, commercepro"
+  },
+  "payment": {
+    "stripeEnabled": true,
+    "stripeKey": "pk_test_••••••••••••••••••••",
+    "paypalEnabled": false,
+    "paypalId": "",
+    "bankEnabled": true,
+    "bankInfo": "Số tài khoản: 123456789\nNgân hàng: Vietcombank\nChủ tài khoản: NGUYEN VAN A",
+    "vnpayTmnCode": "admin@smartshop.com",
+    "vnpayHashSecret": "password123",
+    "bankId": "TCB",
+    "accountNo": "1905 0718 6980 12",
+    "accountName": "HOANG VAN TUYEN",
+    "momoEnabled": true,
+    "momoPhone": "0354608821"
+  },
+  "chatbot": {
+    "apiKey": "sk-••••••••••••••••••••••••••••",
+    "model": "gpt-4-turbo",
+    "enabled": true,
+    "welcomeMessage": "Xin chào! Tôi là trợ lý ảo CommercePro. Tôi có thể giúp gì cho bạn hôm nay?",
+    "tone": "Friendly"
+  },
+  "security": {
+    "twoFactor": false,
+    "maintenance": false
+  }
+}

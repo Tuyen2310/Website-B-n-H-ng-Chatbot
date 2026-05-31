@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "FAQ" ADD COLUMN     "isDeleted" BOOLEAN NOT NULL DEFAULT false;

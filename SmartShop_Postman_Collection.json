@@ -1,0 +1,677 @@
+{
+	"info": {
+		"_postman_id": "smartshop-test-collection-v3",
+		"name": "SmartShop AI – Kiểm thử Hệ thống (9 Test Cases)",
+		"description": "Collection kiểm thử đầy đủ theo 3 loại: Unit Test, Integration Test, System Test. Mỗi loại gồm 3 chức năng. Script test tự động ghi kết quả vào biến để xuất Excel.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. UNIT TEST",
+			"description": "Kiểm thử từng đơn vị chức năng độc lập (API endpoint riêng lẻ)",
+			"item": [
+				{
+					"name": "UT-01 | Đăng nhập với thông tin hợp lệ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'UT-01';",
+									"const testName = 'Đăng nhập với thông tin hợp lệ';",
+									"const testType = 'Unit Test';",
+									"const testFunction = 'Xác thực người dùng (Login)';",
+									"const expected = 'HTTP 200/201 và access_token hợp lệ';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[UT-01] HTTP Status phải là 200 hoặc 201', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"pm.test('[UT-01] Response phải có access_token', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('access_token');",
+									"    pm.collectionVariables.set('token', json.access_token);",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    if ([200,201].includes(pm.response.code) && json.access_token) {",
+									"        actual = 'HTTP ' + pm.response.code + ', access_token được trả về thành công';",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code + ', không có access_token';",
+									"    }",
+									"} catch(e) {",
+									"    actual = 'Lỗi parse JSON: ' + e.message;",
+									"}",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@smartshop.com\",\n    \"password\": \"admin123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UT-02 | Lấy danh sách sản phẩm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'UT-02';",
+									"const testName = 'Lấy danh sách sản phẩm';",
+									"const testType = 'Unit Test';",
+									"const testFunction = 'Xem danh sách sản phẩm (GET Products)';",
+									"const expected = 'HTTP 200, trả về mảng items và tổng số total';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[UT-02] HTTP Status phải là 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('[UT-02] Response phải có items và total', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('items');",
+									"    pm.expect(json).to.have.property('total');",
+									"    pm.expect(json.items).to.be.an('array');",
+									"    if (json.items.length > 0) {",
+									"        pm.collectionVariables.set('firstProductId', json.items[0].id);",
+									"    }",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    if (pm.response.code === 200 && Array.isArray(json.items)) {",
+									"        actual = 'HTTP 200, trả về ' + json.items.length + '/' + json.total + ' sản phẩm';",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code + ', cấu trúc response không đúng';",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products?take=5",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"],
+							"query": [{ "key": "take", "value": "5" }]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UT-03 | Lấy danh sách danh mục",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'UT-03';",
+									"const testName = 'Lấy danh sách danh mục';",
+									"const testType = 'Unit Test';",
+									"const testFunction = 'Xem danh mục sản phẩm (GET Categories)';",
+									"const expected = 'HTTP 200, trả về mảng danh mục không rỗng';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[UT-03] HTTP Status phải là 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('[UT-03] Response phải là mảng danh mục không rỗng', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.be.an('array');",
+									"    pm.expect(json.length).to.be.above(0);",
+									"    if (json.length > 0) {",
+									"        pm.collectionVariables.set('firstCategoryId', json[0].id);",
+									"    }",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    if (pm.response.code === 200 && Array.isArray(json) && json.length > 0) {",
+									"        actual = 'HTTP 200, trả về ' + json.length + ' danh mục (vd: ' + json[0].name + ')';",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code + ', mảng rỗng hoặc sai cấu trúc';",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["categories"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. INTEGRATION TEST",
+			"description": "Kiểm thử tích hợp giữa các module",
+			"item": [
+				{
+					"name": "IT-01 | Đăng nhập → Xem thông tin cá nhân",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'IT-01';",
+									"const testName = 'Đăng nhập → Xem thông tin cá nhân';",
+									"const testType = 'Integration Test';",
+									"const testFunction = 'Tích hợp Auth Module với User Module';",
+									"const expected = 'HTTP 200, trả về thông tin user với email và role chính xác';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[IT-01] HTTP Status phải là 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('[IT-01] Response phải có email và role', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('email');",
+									"    pm.expect(json).to.have.property('role');",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    if (pm.response.code === 200 && json.email && json.role) {",
+									"        actual = 'HTTP 200, user: ' + json.email + ', role: ' + json.role;",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code + ', thiếu thông tin user';",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "me"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "IT-02 | Lọc sản phẩm theo danh mục (Product + Category)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'IT-02';",
+									"const testName = 'Lọc sản phẩm theo danh mục';",
+									"const testType = 'Integration Test';",
+									"const testFunction = 'Tích hợp Product Module với Category Module';",
+									"const expected = 'HTTP 200, danh sách sản phẩm lọc đúng theo categoryId=1';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[IT-02] HTTP Status phải là 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('[IT-02] Tất cả sản phẩm phải thuộc đúng danh mục', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('items');",
+									"    json.items.forEach(p => {",
+									"        pm.expect(p.categoryId).to.equal(1);",
+									"    });",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    if (pm.response.code === 200 && json.items) {",
+									"        const allCorrect = json.items.every(p => p.categoryId === 1);",
+									"        if (allCorrect || json.items.length === 0) {",
+									"            actual = 'HTTP 200, ' + json.items.length + ' sản phẩm đều thuộc categoryId=1';",
+									"            status = 'PASS';",
+									"        } else {",
+									"            actual = 'HTTP 200 nhưng có sản phẩm sai danh mục';",
+									"        }",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code;",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products?category=1&take=5",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"],
+							"query": [
+								{ "key": "category", "value": "1" },
+								{ "key": "take", "value": "5" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "IT-03 | Validate mã khuyến mãi (Promotion + Order Module)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'IT-03';",
+									"const testName = 'Validate mã khuyến mãi';",
+									"const testType = 'Integration Test';",
+									"const testFunction = 'Tích hợp Promotion Module với Order Module';",
+									"const expected = 'HTTP 200 nếu mã tồn tại và hợp lệ; HTTP 404 nếu mã không tồn tại';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[IT-03] Response status phải là 200 hoặc 404', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+									"});",
+									"",
+									"pm.test('[IT-03] Nếu 200 thì phải có trường code và isActive', function () {",
+									"    if (pm.response.code === 200) {",
+									"        const json = pm.response.json();",
+									"        pm.expect(json).to.have.property('code');",
+									"        pm.expect(json).to.have.property('isActive');",
+									"    }",
+									"});",
+									"",
+									"try {",
+									"    const code = pm.response.code;",
+									"    if (code === 200) {",
+									"        const json = pm.response.json();",
+									"        actual = 'HTTP 200, mã: ' + json.code + ', isActive: ' + json.isActive + ', discount: ' + (json.discountPercent || json.discountAmount || 'N/A');",
+									"        status = 'PASS';",
+									"    } else if (code === 404) {",
+									"        actual = 'HTTP 404, mã khuyến mãi không tồn tại trong hệ thống';",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + code + ' không mong đợi';",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/promotions/validate?code={{promoCode}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["promotions", "validate"],
+							"query": [{ "key": "code", "value": "{{promoCode}}" }]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. SYSTEM TEST",
+			"description": "Kiểm thử toàn bộ luồng hệ thống end-to-end",
+			"item": [
+				{
+					"name": "ST-01 | Luồng đặt hàng đầy đủ (Authenticated Order)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const productId = pm.collectionVariables.get('firstProductId') || '1';",
+									"pm.variables.set('orderProductId', productId);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'ST-01';",
+									"const testName = 'Luồng đặt hàng đầy đủ (Authenticated Order)';",
+									"const testType = 'System Test';",
+									"const testFunction = 'Đặt hàng sau khi đăng nhập (Checkout Flow)';",
+									"const expected = 'HTTP 200/201, tạo đơn hàng mới với status PENDING';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[ST-01] HTTP Status phải là 200 hoặc 201', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"pm.test('[ST-01] Đơn hàng phải có id và status PENDING', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('id');",
+									"    pm.expect(json).to.have.property('status');",
+									"    pm.expect(json.status).to.equal('PENDING');",
+									"    pm.collectionVariables.set('lastOrderId', json.id);",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    if ([200,201].includes(pm.response.code) && json.id && json.status === 'PENDING') {",
+									"        actual = 'HTTP ' + pm.response.code + ', Đơn hàng #' + json.id + ' tạo thành công, status: ' + json.status;",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code + ', message: ' + JSON.stringify(pm.response.json()).substring(0,100);",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shippingAddress\": \"123 Đường Kiểm Thử, TP.HCM\",\n    \"shippingProvince\": \"Hồ Chí Minh\",\n    \"paymentMethod\": \"COD\",\n    \"items\": [\n        {\n            \"productId\": {{orderProductId}},\n            \"quantity\": 1,\n            \"price\": 500000\n        }\n    ],\n    \"totalAmount\": 500000,\n    \"shippingFee\": 30000\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ST-02 | Luồng Admin xem thống kê Dashboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'ST-02';",
+									"const testName = 'Luồng Admin xem thống kê Dashboard';",
+									"const testType = 'System Test';",
+									"const testFunction = 'Admin xem Dashboard (Login → Get Stats)';",
+									"const expected = 'HTTP 200, trả về totalRevenue, totalOrders, totalProducts, totalUsers';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[ST-02] HTTP Status phải là 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('[ST-02] Dashboard phải có đủ 4 chỉ số tổng quan', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('totalRevenue');",
+									"    pm.expect(json).to.have.property('totalOrders');",
+									"    pm.expect(json).to.have.property('totalProducts');",
+									"    pm.expect(json).to.have.property('totalUsers');",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    if (pm.response.code === 200 && json.totalRevenue !== undefined) {",
+									"        actual = 'HTTP 200, Doanh thu: ' + json.totalRevenue.toLocaleString('vi-VN') + ' VNĐ, Đơn hàng: ' + json.totalOrders + ', SP: ' + json.totalProducts + ', Users: ' + json.totalUsers;",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code + ', thiếu dữ liệu thống kê';",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+						"url": {
+							"raw": "{{baseUrl}}/admin/stats?timeRange=ALL",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "stats"],
+							"query": [{ "key": "timeRange", "value": "ALL" }]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ST-03 | Luồng Chatbot AI trả lời câu hỏi sản phẩm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'ST-03';",
+									"const testName = 'Luồng Chatbot AI trả lời câu hỏi sản phẩm';",
+									"const testType = 'System Test';",
+									"const testFunction = 'AI Chatbot tư vấn sản phẩm end-to-end';",
+									"const expected = 'HTTP 200/201, AI trả về câu trả lời không rỗng';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[ST-03] HTTP Status phải là 200 hoặc 201', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"pm.test('[ST-03] AI phải trả về câu trả lời không rỗng', function () {",
+									"    const json = pm.response.json();",
+									"    // NestJS chatbot có thể trả về 'response' hoặc 'reply' hoặc 'answer'",
+									"    const answer = json.response || json.reply || json.answer || json.message;",
+									"    pm.expect(answer).to.be.a('string');",
+									"    pm.expect(answer.length).to.be.above(0);",
+									"});",
+									"",
+									"try {",
+									"    const json = pm.response.json();",
+									"    const answer = json.response || json.reply || json.answer || json.message || '';",
+									"    if ([200,201].includes(pm.response.code) && answer.length > 0) {",
+									"        actual = 'HTTP ' + pm.response.code + ', AI trả lời: \"' + answer.substring(0, 80) + '...\"';",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code + ', fields hiện có: ' + Object.keys(json).join(', ');",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));",
+									"",
+									"// === IN BẢNG TỔNG KẾT CUỐI CÙNG ===",
+									"const allResults = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"const passed = allResults.filter(r => r.status === 'PASS').length;",
+									"console.log('=== TỔNG KẾT: ' + passed + '/' + allResults.length + ' PASS ===');",
+									"allResults.forEach(r => console.log('[' + r.status + '] ' + r.id + ' | ' + r.type + ' | ' + r.name));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"Cho tôi xem các điện thoại iPhone dưới 20 triệu đồng\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chatbot/chat",
+							"host": ["{{baseUrl}}"],
+							"path": ["chatbot", "chat"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"if (!pm.collectionVariables.get('testResults')) {",
+					"    pm.collectionVariables.set('testResults', '[]');",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [""]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testResults",
+			"value": "[]",
+			"type": "string"
+		},
+		{
+			"key": "lastOrderId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "firstCategoryId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "firstProductId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "promoCode",
+			"value": "GIAM10",
+			"type": "string",
+			"description": "Thay bằng mã khuyến mãi thực tế trong database"
+		},
+		{
+			"key": "orderProductId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

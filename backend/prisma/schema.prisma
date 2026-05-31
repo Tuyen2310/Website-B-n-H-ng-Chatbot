@@ -1,0 +1,329 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPING
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  BANK
+  E_WALLET
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String?
+  name      String
+  phone     String?
+  address   String?
+  role      Role     @default(USER)
+  isBlocked Boolean  @default(false)
+  points    Int      @default(0)
+  googleId  String?  @unique
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  otpCode      String?
+  otpExpires   DateTime?
+  isVerified   Boolean  @default(true)
+  
+  orders     Order[]
+  reviews    Review[]
+  addresses  Address[]
+  cart       Cart?
+  wishlists  Wishlist[]
+  auditLogs  AdminAuditLog[]
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  isDeleted   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  products    Product[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Float
+  description String
+  images      String[] // Array of image URLs
+  videoUrl    String?  // Optional video URL
+  stock       Int      @default(0)
+  soldCount   Int      @default(0)
+  categoryId  Int
+  attributes  Json?    // Flexible attributes like color, storage, etc.
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  category    Category         @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  reviews     Review[]
+  faqs        FAQ[]            // FAQs related to this product
+  variants    ProductVariant[]
+  wishlists   Wishlist[]
+  cartItems   CartItem[]
+
+  @@index([categoryId])
+  @@index([isDeleted])
+  @@index([createdAt])
+}
+
+model ProductAttribute {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique // e.g., "Màu sắc", "Dung lượng"
+  values    String[] // Danh sách các giá trị gợi ý, ví dụ: ["Đỏ", "Xanh"]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PromotionType {
+  DISCOUNT
+  FREESHIP
+}
+
+model Order {
+  id             Int           @id @default(autoincrement())
+  userId         Int?
+  guestName      String?
+  guestEmail     String?
+  guestPhone     String?
+  totalAmount    Float
+  shippingFee    Float         @default(0)
+  discountAmount Float         @default(0)
+  status         OrderStatus   @default(PENDING)
+  paymentMethod  PaymentMethod
+  paymentStatus  Boolean       @default(false)
+  paymentId      String?       @unique
+  paymentUrl     String?
+  shippingAddress String
+  pointsUsed     Int?          @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  user           User?         @relation(fields: [userId], references: [id])
+  items          OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price      Float   // Price at the time of purchase
+  variantId  Int?    // Optional reference to a specific variant (SKU)
+  
+  order      Order           @relation(fields: [orderId], references: [id])
+  product    Product         @relation(fields: [productId], references: [id])
+  variant    ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Promotion {
+  id              Int           @id @default(autoincrement())
+  code            String        @unique
+  type            PromotionType @default(DISCOUNT)
+  discountPercent Float?        // For percentage discount
+  discountAmount  Float?        // For fixed amount discount
+  minOrderAmount  Float?        @default(0)
+  maxDiscount     Float?        // Max discount for percentage types
+  startDate       DateTime
+  endDate         DateTime
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model FAQ {
+  id        Int      @id @default(autoincrement())
+  question  String
+  answer    String
+  topic     String   // e.g., 'Product', 'Shipping', 'Payment'
+  productId Int?     // Optional mapping to a specific product
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  product   Product? @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  rating    Int      // e.g., 1 to 5
+  comment   String?
+  reply     String?   // Admin reply
+  repliedAt DateTime? // When admin replied
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+}
+
+model ChatbotLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     // Nullable if user is not logged in
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id              Int      @id @default(1)
+  // General
+  shopName        String   @default("CommercePro Elite")
+  tagline         String?  @default("Trải nghiệm mua sắm thông minh cùng AI")
+  email           String?  @default("support@commercepro.vn")
+  phone           String?  @default("0988.123.456")
+  address         String?  @default("Số 123 Đường Láng, Đống Đa, Hà Nội")
+  facebook        String?
+  instagram       String?
+  twitter         String?
+  logo            String?
+  favicon         String?
+  banner          String?
+  // SEO
+  metaTitle       String?  @default("CommercePro - Hệ thống thương mại điện tử tích hợp AI")
+  metaDescription String?  @default("Khám phá hàng ngàn sản phẩm chất lượng cao với sự hỗ trợ của Chatbot thông minh 24/7.")
+  keywords        String?  @default("ecommerce, ai chatbot, smart shopping, commercepro")
+  // Payment
+  bankEnabled     Boolean  @default(true)
+  bankId          String?  @default("VCB")
+  accountNo       String?  @default("1234567890")
+  accountName     String?  @default("CONG TY TNHH ANTIGRAVITY")
+  momoEnabled     Boolean  @default(false)
+  momoPhone       String?
+  vnpayEnabled    Boolean  @default(false)
+  vnpayTmnCode    String?
+  vnpayHashSecret String?
+  // Chatbot
+  chatbotEnabled  Boolean  @default(true)
+  chatbotApiKey   String?
+  chatbotModel    String?  @default("gemini-1.5-flash")
+  chatbotWelcome  String?  @default("Xin chào! Tôi là trợ lý ảo CommercePro. Tôi có thể giúp gì cho bạn hôm nay?")
+  // Security
+  maintenance     Boolean  @default(false)
+  twoFactor       Boolean  @default(false)
+  // Metadata
+  updatedAt       DateTime @updatedAt
+}
+
+// ==========================================
+// THÊM MỚI THEO KIẾN TRÚC MỞ RỘNG (V2)
+// ==========================================
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String   // e.g., "Nhà riêng", "Công ty"
+  phone     String
+  address   String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  variantId Int?     // If product has specific variants (color, size)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  cart      Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@unique([cartId, productId, variantId])
+}
+
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model ProductVariant {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  sku         String   @unique // Stock Keeping Unit
+  name        String   // e.g., "Đỏ - 256GB"
+  price       Float    // Override base product price
+  stock       Int      @default(0)
+  attributes  Json     // e.g., {"color": "Red", "storage": "256GB"}
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+}
+
+model AdminAuditLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  action    String   // e.g., "UPDATE_PRODUCT", "DELETE_ORDER"
+  entity    String   // e.g., "Product", "Order"
+  entityId  Int?     // Target ID
+  details   Json?    // Changes or extra info
+  createdAt DateTime @default(now())
+  
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
