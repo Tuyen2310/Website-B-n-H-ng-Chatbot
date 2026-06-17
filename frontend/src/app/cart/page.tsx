@@ -4,13 +4,13 @@ import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Zap } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Price } from "@/components/ui/price";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, getTotal } = useCartStore();
+  const { items, removeItem, updateQuantity, getTotal, getVolumeDiscountPercent } = useCartStore();
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration error
@@ -120,15 +120,27 @@ export default function CartPage() {
               <div className="space-y-4">
                 <div className="flex justify-between text-sm font-bold">
                   <span className="text-gray-400">Tạm tính</span>
-                  <span className="text-gray-900 font-extrabold"><Price amount={getTotal()} /></span>
+                  <span className="text-gray-900 font-extrabold dark:text-slate-100">
+                    <Price amount={items.reduce((acc, item) => acc + item.price * item.quantity, 0)} />
+                  </span>
                 </div>
+                {getVolumeDiscountPercent() > 0 && (
+                  <div className="flex justify-between text-sm font-bold animate-fade-in">
+                    <span className="text-red-500 flex items-center gap-1">
+                      <Zap className="h-4 w-4" /> Mua nhiều giảm nhiều ({getVolumeDiscountPercent() * 100}%)
+                    </span>
+                    <span className="text-red-500 font-extrabold">
+                      - <Price amount={items.reduce((acc, item) => acc + item.price * item.quantity, 0) * getVolumeDiscountPercent()} />
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm font-bold">
                   <span className="text-gray-400">Vận chuyển</span>
                   <span className="text-green-600 font-extrabold">Miễn phí</span>
                 </div>
               </div>
               
-              <Separator className="bg-gray-100" />
+              <Separator className="bg-gray-100 dark:bg-slate-800" />
               
               <div className="flex justify-between items-center py-2">
                 <span className="text-lg font-black uppercase tracking-tighter">Tổng cộng</span>

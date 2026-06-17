@@ -45,7 +45,7 @@ async function main() {
   // 3. Tạo Người dùng
   const adminPassword = await bcrypt.hash('admin123', 10);
   const userPassword = await bcrypt.hash('user123', 10);
-  
+
   const admin = await prisma.user.create({
     data: {
       email: 'admin@smartshop.com',
@@ -95,21 +95,27 @@ async function main() {
       const productName = `${catName} Cao Cấp Mẫu Số ${i}`;
 
       const safeSeed = catName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
-      
+
       const images = [
         `https://picsum.photos/seed/${safeSeed}_${i}_main/600/600`,
         `https://picsum.photos/seed/${safeSeed}_${i}_detail1/800/800`,
         `https://picsum.photos/seed/${safeSeed}_${i}_detail2/800/800`,
       ];
 
+      const isFlash = Math.random() > 0.7; // 30% chance to be flash sale
+      const originalPrice = Math.floor(Math.random() * 5000000) + 100000;
+      const fSalePrice = isFlash ? Math.floor(originalPrice * 0.8) : null;
+
       await (prisma.product.create as any)({
         data: {
           name: productName,
-          price: Math.floor(Math.random() * 5000000) + 100000, 
+          price: originalPrice,
           description: `Đây là thông tin mô tả chi tiết cho ${productName}. Sản phẩm được bảo hành chính hãng và đi kèm nhiều phụ kiện hấp dẫn. Hãy đặt mua ngay hôm nay để nhận ưu đãi!`,
           stock: Math.floor(Math.random() * 100) + 10,
           categoryId: category.id,
           images: images,
+          isFlashSale: isFlash,
+          flashSalePrice: fSalePrice,
           attributes: {
             brand: "Thương hiệu Demo",
             origin: "Việt Nam",
@@ -164,40 +170,40 @@ async function main() {
   // 7. Tạo FAQs (Kho tri thức chuyên nghiệp)
   await prisma.fAQ.createMany({
     data: [
-      { 
-        question: 'Thời gian giao hàng mất bao lâu?', 
-        answer: 'Dạ, nội thành Hà Nội & TP.HCM chúng em giao trong 2h. Các tỉnh thành khác sẽ từ 2-3 ngày làm việc ạ.', 
-        topic: 'Vận chuyển' 
+      {
+        question: 'Thời gian giao hàng mất bao lâu?',
+        answer: 'Dạ, nội thành Hà Nội & TP.HCM chúng em giao trong 2h. Các tỉnh thành khác sẽ từ 2-3 ngày làm việc ạ.',
+        topic: 'Vận chuyển'
       },
-      { 
-        question: 'Tôi có được kiểm tra hàng trước khi thanh toán không?', 
-        answer: 'Dạ có ạ! SmartShop hỗ trợ Quý khách đồng kiểm (mở hộp kiểm tra sản phẩm) trước khi thanh toán cho shipper để đảm bảo hàng đúng mẫu mã và chất lượng.', 
-        topic: 'Vận chuyển' 
+      {
+        question: 'Tôi có được kiểm tra hàng trước khi thanh toán không?',
+        answer: 'Dạ có ạ! SmartShop hỗ trợ Quý khách đồng kiểm (mở hộp kiểm tra sản phẩm) trước khi thanh toán cho shipper để đảm bảo hàng đúng mẫu mã và chất lượng.',
+        topic: 'Vận chuyển'
       },
-      { 
-        question: 'Chính sách bảo hành của cửa hàng như thế nào?', 
-        answer: 'Tất cả sản phẩm công nghệ tại SmartShop đều được bảo hành 12 tháng chính hãng. Đặc biệt, chúng em hỗ trợ 1 đổi 1 trong 30 ngày đầu nếu có lỗi từ nhà sản xuất ạ.', 
-        topic: 'Bảo hành' 
+      {
+        question: 'Chính sách bảo hành của cửa hàng như thế nào?',
+        answer: 'Tất cả sản phẩm công nghệ tại SmartShop đều được bảo hành 12 tháng chính hãng. Đặc biệt, chúng em hỗ trợ 1 đổi 1 trong 30 ngày đầu nếu có lỗi từ nhà sản xuất ạ.',
+        topic: 'Bảo hành'
       },
-      { 
-        question: 'Shop có hỗ trợ trả góp không?', 
-        answer: 'Dạ có ạ, bên em hỗ trợ trả góp 0% lãi suất qua thẻ tín dụng của hơn 20 ngân hàng, hoặc trả góp qua hồ sơ (CCCD) với các công ty tài chính như Home Credit, FE Credit.', 
-        topic: 'Thanh toán' 
+      {
+        question: 'Shop có hỗ trợ trả góp không?',
+        answer: 'Dạ có ạ, bên em hỗ trợ trả góp 0% lãi suất qua thẻ tín dụng của hơn 20 ngân hàng, hoặc trả góp qua hồ sơ (CCCD) với các công ty tài chính như Home Credit, FE Credit.',
+        topic: 'Thanh toán'
       },
-      { 
-        question: 'Làm sao để được miễn phí vận chuyển?', 
-        answer: 'Dạ, với mọi đơn hàng có giá trị từ 200.000đ trở lên, SmartShop sẽ miễn phí vận chuyển toàn quốc cho Quý khách ạ.', 
-        topic: 'Ưu đãi' 
+      {
+        question: 'Làm sao để được miễn phí vận chuyển?',
+        answer: 'Dạ, với mọi đơn hàng có giá trị từ 200.000đ trở lên, SmartShop sẽ miễn phí vận chuyển toàn quốc cho Quý khách ạ.',
+        topic: 'Ưu đãi'
       },
-      { 
-        question: 'Cửa hàng có địa chỉ ở đâu?', 
-        answer: 'Dạ, Quý khách có thể ghé thăm chúng em tại địa chỉ: 123 Đường Công Nghệ, Đống Đa, Hà Nội để trải nghiệm trực tiếp sản phẩm ạ.', 
-        topic: 'Thông tin' 
+      {
+        question: 'Cửa hàng có địa chỉ ở đâu?',
+        answer: 'Dạ, Quý khách có thể ghé thăm chúng em tại địa chỉ: 123 Đường Công Nghệ, Đống Đa, Hà Nội để trải nghiệm trực tiếp sản phẩm ạ.',
+        topic: 'Thông tin'
       },
-      { 
-        question: 'Sản phẩm có phải hàng chính hãng không?', 
-        answer: 'SmartShop cam kết 100% sản phẩm là hàng chính hãng, mới nguyên seal. Nếu phát hiện hàng giả, chúng em xin đền bù 200% giá trị đơn hàng ạ.', 
-        topic: 'Sản phẩm' 
+      {
+        question: 'Sản phẩm có phải hàng chính hãng không?',
+        answer: 'SmartShop cam kết 100% sản phẩm là hàng chính hãng, mới nguyên seal. Nếu phát hiện hàng giả, chúng em xin đền bù 200% giá trị đơn hàng ạ.',
+        topic: 'Sản phẩm'
       },
     ]
   });

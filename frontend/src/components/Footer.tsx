@@ -26,7 +26,7 @@ export default function Footer() {
               {(settings as any)?.general?.logo ? (
                 <img src={(settings as any).general.logo} alt={shopName} className="h-10 w-auto object-contain" />
               ) : (
-                <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <div className="h-10 w-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
                   <Bot className="h-6 w-6 text-white" />
                 </div>
               )}

@@ -75,7 +75,7 @@ export class SettingsController {
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log('File uploaded:', file);
     return {
-      url: `http://localhost:3001/uploads/${file.filename}`
+      url: `http://smartshop.local:3001/uploads/${file.filename}`
     };
   }
 }

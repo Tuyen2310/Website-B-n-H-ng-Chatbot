@@ -24,7 +24,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'http',
-        hostname: 'localhost',
+        hostname: 'smartshop.local',
+        port: '3001',
+      },
+      {
+        protocol: 'http',
+        hostname: 'smartshop.local',
         port: '3001',
       },
       {
@@ -67,7 +72,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3001/api/:path*',
+        destination: 'http://smartshop.local:3001/api/:path*',
       },
     ];
   },

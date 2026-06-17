@@ -88,6 +88,10 @@ let SettingsService = class SettingsService {
                 twoFactor: dbSettings.twoFactor || false,
                 maintenance: dbSettings.maintenance || false,
             },
+            flashSale: {
+                startTime: dbSettings.flashSaleStartTime,
+                endTime: dbSettings.flashSaleEndTime,
+            },
         };
     }
     settingsCache = null;
@@ -106,7 +110,7 @@ let SettingsService = class SettingsService {
         const settings = await this.getSettings();
         if (!settings)
             return null;
-        const { general, seo, payment } = settings;
+        const { general, seo, payment, flashSale } = settings;
         const publicPayment = {
             bankEnabled: payment.bankEnabled,
             bankId: payment.bankId,
@@ -115,7 +119,7 @@ let SettingsService = class SettingsService {
             momoEnabled: payment.momoEnabled,
             momoPhone: payment.momoPhone,
         };
-        return { general, seo, payment: publicPayment, security: { maintenance: settings.security?.maintenance || false } };
+        return { general, seo, payment: publicPayment, security: { maintenance: settings.security?.maintenance || false }, flashSale };
     }
     async updateSettings(data) {
         const existing = await this.prisma.settings.findFirst();
@@ -188,6 +192,12 @@ let SettingsService = class SettingsService {
                 flatData.maintenance = data.security.maintenance;
             if (data.security.twoFactor !== undefined)
                 flatData.twoFactor = data.security.twoFactor;
+        }
+        if (data.flashSale) {
+            if (data.flashSale.startTime !== undefined)
+                flatData.flashSaleStartTime = data.flashSale.startTime ? new Date(data.flashSale.startTime) : null;
+            if (data.flashSale.endTime !== undefined)
+                flatData.flashSaleEndTime = data.flashSale.endTime ? new Date(data.flashSale.endTime) : null;
         }
         const updated = await this.prisma.settings.upsert({
             where: { id },

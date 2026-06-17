@@ -3,7 +3,8 @@
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import ChatbotWidget from "@/components/ChatbotWidget";
+import dynamic from "next/dynamic";
+const ChatbotWidget = dynamic(() => import("@/components/ChatbotWidget"), { ssr: false });
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useEffect } from "react";

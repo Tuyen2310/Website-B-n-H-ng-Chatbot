@@ -1,5 +1,18 @@
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+export interface ProductImportRow {
+    name: string;
+    price: number;
+    description: string;
+    stock: number;
+    categoryId: number;
+    images?: string;
+    videoUrl?: string;
+    isFlashSale?: boolean | string | number;
+    flashSalePrice?: number;
+    attributes?: string;
+    sku?: string;
+}
 export declare class ProductsService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -16,6 +29,8 @@ export declare class ProductsService {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
     }>;
     findAll(query: {
@@ -27,6 +42,7 @@ export declare class ProductsService {
         sortOrder?: 'asc' | 'desc';
         skip?: number;
         take?: number;
+        isFlashSale?: boolean | string;
     }): Promise<{
         items: ({
             category: {
@@ -50,6 +66,8 @@ export declare class ProductsService {
             stock: number;
             soldCount: number;
             attributes: Prisma.JsonValue | null;
+            isFlashSale: boolean;
+            flashSalePrice: number | null;
             categoryId: number;
         })[];
         total: number;
@@ -105,6 +123,8 @@ export declare class ProductsService {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
     }) | null>;
     getRecommendations(id: number, limit?: number): Promise<{
@@ -117,6 +137,8 @@ export declare class ProductsService {
         price: number;
         images: string[];
         soldCount: number;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
     }[]>;
     update(id: number, data: Prisma.ProductUncheckedUpdateInput): Promise<{
         isDeleted: boolean;
@@ -131,6 +153,8 @@ export declare class ProductsService {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
     }>;
     remove(id: number): Promise<{
@@ -146,6 +170,18 @@ export declare class ProductsService {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
+    }>;
+    generateExcelTemplate(): Buffer;
+    importFromExcel(fileBuffer: Buffer): Promise<{
+        success: number;
+        failed: number;
+        errors: {
+            row: number;
+            error: string;
+        }[];
+        imported: any[];
     }>;
 }

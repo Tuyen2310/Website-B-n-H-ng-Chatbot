@@ -23,6 +23,7 @@ export declare class SettingsService implements OnModuleInit {
         security: {
             maintenance: any;
         };
+        flashSale: any;
     } | null>;
     updateSettings(data: any): Promise<{
         general: {
@@ -64,6 +65,10 @@ export declare class SettingsService implements OnModuleInit {
         security: {
             twoFactor: any;
             maintenance: any;
+        };
+        flashSale: {
+            startTime: any;
+            endTime: any;
         };
     } | null>;
     clearCache(): Promise<{

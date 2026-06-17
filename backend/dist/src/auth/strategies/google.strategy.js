@@ -20,7 +20,7 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
         super({
             clientID: configService.get('GOOGLE_CLIENT_ID') || 'mock-client-id',
             clientSecret: configService.get('GOOGLE_CLIENT_SECRET') || 'mock-client-secret',
-            callbackURL: configService.get('GOOGLE_CALLBACK_URL') || 'http://localhost:3001/api/auth/google/callback',
+            callbackURL: configService.get('GOOGLE_CALLBACK_URL') || 'http://smartshop.local:3001/api/auth/google/callback',
             scope: ['email', 'profile'],
         });
         this.configService = configService;

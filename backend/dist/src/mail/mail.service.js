@@ -164,7 +164,7 @@ let MailService = MailService_1 = class MailService {
     }
     async sendAdminNewOrderAlert(adminEmails, orderDetails, token) {
         try {
-            const backendUrl = process.env.API_URL || 'http://localhost:3001';
+            const backendUrl = process.env.API_URL || 'http://smartshop.local:3001';
             const quickActionBase = `${backendUrl}/api/orders/quick-status?id=${orderDetails.id}&token=${token}&status=`;
             const confirmLink = quickActionBase + 'CONFIRMED';
             const shippingLink = quickActionBase + 'SHIPPING';

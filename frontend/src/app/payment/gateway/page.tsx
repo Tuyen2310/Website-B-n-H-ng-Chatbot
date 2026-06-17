@@ -2,13 +2,13 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSettingsStore } from "@/store/settingsStore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ArrowLeft, QrCode, Building, CreditCard, User, AlertCircle } from "lucide-react";
 import { Price } from "@/components/ui/price";
 
-export default function PaymentGatewayPage() {
+function PaymentGatewayInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { publicSettings } = useSettingsStore();
@@ -136,5 +136,13 @@ export default function PaymentGatewayPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PaymentGatewayPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#F9F9FF]">Đang tải...</div>}>
+      <PaymentGatewayInner />
+    </Suspense>
   );
 }

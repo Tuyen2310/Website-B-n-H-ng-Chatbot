@@ -1,3 +1,4 @@
+import { StreamableFile } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Prisma } from '@prisma/client';
 export declare class ProductsController {
@@ -16,9 +17,11 @@ export declare class ProductsController {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
     }>;
-    findAll(category?: string, search?: string, minPrice?: string, maxPrice?: string, sortBy?: string, sortOrder?: 'asc' | 'desc', skip?: string, take?: string): Promise<{
+    findAll(category?: string, search?: string, minPrice?: string, maxPrice?: string, sortBy?: string, sortOrder?: 'asc' | 'desc', skip?: string, take?: string, isFlashSale?: string): Promise<{
         items: ({
             category: {
                 isDeleted: boolean;
@@ -41,9 +44,23 @@ export declare class ProductsController {
             stock: number;
             soldCount: number;
             attributes: Prisma.JsonValue | null;
+            isFlashSale: boolean;
+            flashSalePrice: number | null;
             categoryId: number;
         })[];
         total: number;
+    }>;
+    downloadTemplate(): StreamableFile;
+    importExcel(file: Express.Multer.File): Promise<{
+        success: number;
+        failed: number;
+        errors: {
+            row: number;
+            error: string;
+        }[];
+        imported: any[];
+    } | {
+        error: string;
     }>;
     findOne(id: number): Promise<({
         category: {
@@ -96,6 +113,8 @@ export declare class ProductsController {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
     }) | null>;
     getRecommendations(id: number): Promise<{
@@ -108,6 +127,8 @@ export declare class ProductsController {
         price: number;
         images: string[];
         soldCount: number;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
     }[]>;
     update(id: number, data: Prisma.ProductUncheckedUpdateInput): Promise<{
         isDeleted: boolean;
@@ -122,6 +143,8 @@ export declare class ProductsController {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
     }>;
     remove(id: number): Promise<{
@@ -137,6 +160,8 @@ export declare class ProductsController {
         stock: number;
         soldCount: number;
         attributes: Prisma.JsonValue | null;
+        isFlashSale: boolean;
+        flashSalePrice: number | null;
         categoryId: number;
     }>;
 }

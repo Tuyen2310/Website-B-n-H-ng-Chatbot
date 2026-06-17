@@ -46,7 +46,7 @@ let SettingsController = class SettingsController {
     async uploadFile(file) {
         console.log('File uploaded:', file);
         return {
-            url: `http://localhost:3001/uploads/${file.filename}`
+            url: `http://smartshop.local:3001/uploads/${file.filename}`
         };
     }
 };

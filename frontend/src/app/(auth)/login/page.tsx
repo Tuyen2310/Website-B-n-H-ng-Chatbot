@@ -129,7 +129,7 @@ function LoginForm() {
             type="button" 
             variant="outline"
             className="w-full h-12 rounded-xl text-base font-extrabold bg-white hover:bg-gray-50 text-gray-700 hover:scale-[1.01] transition-all"
-            onClick={() => window.location.href = 'http://localhost:3001/api/auth/google'}
+            onClick={() => window.location.href = 'http://smartshop.local:3001/api/auth/google'}
           >
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5 mr-2" />
             Đăng nhập bằng Google

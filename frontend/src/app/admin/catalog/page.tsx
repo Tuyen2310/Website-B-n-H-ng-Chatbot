@@ -21,11 +21,14 @@ import {
   Image as ImageIcon,
   MoreVertical,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  FileSpreadsheet,
+  Zap
 } from "lucide-react";
+import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner"; 
 import { useRouter } from "next/navigation";
 import {
@@ -56,6 +59,40 @@ export default function AdminCatalogPage() {
   const [stockFilter, setStockFilter] = useState("ALL");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    const toastId = toast.loading("Đang import sản phẩm từ Excel...");
+
+    try {
+      const res = await adminApi.importProductsExcel(file);
+      setIsImporting(false);
+      
+      if (res.success > 0) {
+        toast.success(`Import thành công ${res.success} sản phẩm!`, { id: toastId });
+        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      } else {
+        toast.error("Không có sản phẩm nào được import thành công.", { id: toastId });
+      }
+      
+      if (res.failed > 0) {
+        toast.warning(`${res.failed} dòng gặp lỗi. Nhấp 'Xem chi tiết' để xem mô tả lỗi.`, {
+          duration: 6000
+        });
+      }
+    } catch (err: any) {
+      setIsImporting(false);
+      toast.error(err?.response?.data?.message || "Lỗi khi import file Excel.", { id: toastId });
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-products", page, limit, searchTerm, selectedCategory, minPrice, maxPrice],
@@ -102,12 +139,42 @@ export default function AdminCatalogPage() {
           <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">Quản lý sản phẩm</h1>
           <p className="text-gray-400 font-medium italic">Theo dõi và cập nhật danh mục sản phẩm của bạn.</p>
         </div>
-        <Button 
-          className="btn-action gap-2"
-          onClick={() => router.push("/admin/catalog/new")}
-        >
-          <Plus className="h-5 w-5" /> Thêm sản phẩm mới
-        </Button>
+        <div className="flex items-center gap-3">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImportFile}
+            accept=".xlsx,.xls"
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 font-bold text-sm transition-all"
+            onClick={() => router.push("/admin/flash-sale")}
+          >
+            <Zap className="h-4 w-4 fill-current text-red-500" /> Cấu hình Flash Sale
+          </Button>
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold text-sm transition-all"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isImporting}
+          >
+            <FileSpreadsheet className="h-4 w-4" /> Import Excel
+          </Button>
+          <Link
+            href="/admin/catalog/import"
+            className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors underline mr-2"
+          >
+            Xem hướng dẫn
+          </Link>
+          <Button 
+            className="btn-action gap-2"
+            onClick={() => router.push("/admin/catalog/new")}
+          >
+            <Plus className="h-5 w-5" /> Thêm sản phẩm mới
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-100/50">

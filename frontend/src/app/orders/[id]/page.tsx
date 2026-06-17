@@ -48,7 +48,8 @@ export default function OrderDetailsPage() {
   if (!order) return <div className="container mx-auto py-40 text-center font-extrabold text-2xl text-[#070f2b] animate-fade-in-up">Đơn hàng không tồn tại.</div>;
 
   return (
-    <div className="min-h-screen bg-[#F9F9FF] pt-32 pb-20">
+    <>
+    <div className="min-h-screen bg-[#F9F9FF] pt-32 pb-20 print:hidden">
       <div className="container mx-auto px-4 max-w-4xl">
         <Button 
           variant="ghost" 
@@ -199,6 +200,61 @@ export default function OrderDetailsPage() {
         </div>
       </div>
     </div>
+
+      {/* Print Template - Hidden on screen, visible on print */}
+      <div className="hidden print:block w-full bg-white text-black p-8 font-sans">
+        <div className="text-center mb-8 border-b-2 border-black pb-4">
+          <h1 className="text-3xl font-bold uppercase mb-2">HÓA ĐƠN MUA HÀNG</h1>
+          <p className="text-sm font-bold">Mã đơn: #{order.id}</p>
+          <p className="text-sm">Ngày đặt: {new Date(order.createdAt).toLocaleString("vi-VN")}</p>
+        </div>
+        <div className="mb-8 flex justify-between">
+          <div className="w-1/2">
+            <h3 className="font-bold uppercase border-b border-black inline-block mb-2 text-sm">Khách hàng</h3>
+            <p className="font-bold text-lg">{order.user?.name || "Khách mua hàng"}</p>
+            <p><strong>Điện thoại:</strong> {order.user?.phone || "N/A"}</p>
+            <p><strong>Email:</strong> {order.user?.email || "N/A"}</p>
+          </div>
+          <div className="w-1/2">
+            <h3 className="font-bold uppercase border-b border-black inline-block mb-2 text-sm">Giao hàng & Thanh toán</h3>
+            <p><strong>Địa chỉ:</strong> {order.shippingAddress}</p>
+            <p><strong>Thanh toán:</strong> {order.paymentMethod} - {order.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}</p>
+          </div>
+        </div>
+        <table className="w-full text-left border-collapse mb-8">
+          <thead>
+            <tr className="border-b-2 border-black">
+              <th className="py-2 uppercase text-xs font-bold w-[50%]">Sản phẩm</th>
+              <th className="py-2 uppercase text-xs font-bold text-center">Số lượng</th>
+              <th className="py-2 uppercase text-xs font-bold text-right">Đơn giá</th>
+              <th className="py-2 uppercase text-xs font-bold text-right">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            {order.items?.map((item: any) => (
+              <tr key={item.id} className="border-b border-gray-300">
+                <td className="py-3 pr-4">{item.product?.name}</td>
+                <td className="py-3 text-center">{item.quantity}</td>
+                <td className="py-3 text-right">${item.price.toLocaleString()}</td>
+                <td className="py-3 text-right">${(item.price * item.quantity).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="flex justify-end text-lg mt-8">
+          <div className="w-72 border-t-2 border-black pt-2">
+            <div className="flex justify-between font-black text-xl">
+              <span className="uppercase">Tổng cộng:</span>
+              <span>${order.totalAmount.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-16 pt-8 text-center border-t border-gray-300">
+          <p className="italic font-bold text-gray-800">Cảm ơn quý khách đã mua sắm tại cửa hàng!</p>
+          <p className="text-xs text-gray-500 mt-1">Xin vui lòng giữ lại hóa đơn để phục vụ cho việc bảo hành, đổi trả.</p>
+        </div>
+      </div>
+    </>
   );
 }
 

@@ -3,6 +3,7 @@ import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import Providers from "../providers/Providers";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,7 +35,7 @@ export default function RootLayout({
       className={`${inter.variable} ${manrope.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
     >
-      <body className="min-h-full flex flex-col font-sans bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300">
+      <body className="min-h-full flex flex-col font-sans text-slate-900 dark:text-slate-50 transition-colors duration-300">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -48,6 +49,7 @@ export default function RootLayout({
           </Providers>
         </ThemeProvider>
       </body>
+      <GoogleAnalytics gaId="G-XYZ123456" />
     </html>
   );
 }

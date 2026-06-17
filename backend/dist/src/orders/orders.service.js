@@ -31,6 +31,10 @@ let OrdersService = class OrdersService {
         return this.prisma.$transaction(async (tx) => {
             let totalAmount = 0;
             const orderItemsData = [];
+            const settings = await tx.settings.findFirst();
+            const now = new Date();
+            const isFlashSaleActive = settings && settings.flashSaleStartTime && settings.flashSaleEndTime &&
+                now >= new Date(settings.flashSaleStartTime) && now <= new Date(settings.flashSaleEndTime);
             for (const item of createOrderDto.items) {
                 const product = await tx.product.findUnique({ where: { id: item.productId } });
                 if (!product || product.isDeleted) {
@@ -43,7 +47,9 @@ let OrdersService = class OrdersService {
                     where: { id: product.id },
                     data: { stock: { decrement: item.quantity } },
                 });
-                const price = product.price;
+                const price = isFlashSaleActive && product.isFlashSale && product.flashSalePrice
+                    ? product.flashSalePrice
+                    : product.price;
                 totalAmount += price * item.quantity;
                 orderItemsData.push({
                     productId: product.id,
@@ -51,8 +57,18 @@ let OrdersService = class OrdersService {
                     price: price,
                 });
             }
+            const totalItemsQuantity = createOrderDto.items.reduce((acc, item) => acc + item.quantity, 0);
+            let volumeDiscountPercent = 0;
+            if (totalItemsQuantity >= 4)
+                volumeDiscountPercent = 0.15;
+            else if (totalItemsQuantity === 3)
+                volumeDiscountPercent = 0.10;
+            else if (totalItemsQuantity === 2)
+                volumeDiscountPercent = 0.05;
+            const volumeDiscountAmount = totalAmount * volumeDiscountPercent;
+            totalAmount = totalAmount - volumeDiscountAmount;
             let shippingFee = this.calculateShippingFee(createOrderDto.shippingProvince);
-            let discountAmount = 0;
+            let discountAmount = volumeDiscountAmount;
             if (createOrderDto.voucherCode) {
                 const promotion = await this.promotionsService.findByCode(createOrderDto.voucherCode);
                 if (promotion && totalAmount >= (promotion.minOrderAmount || 0)) {

@@ -19,6 +19,8 @@ export declare class OrdersController {
                 stock: number;
                 soldCount: number;
                 attributes: import("@prisma/client/runtime/library").JsonValue | null;
+                isFlashSale: boolean;
+                flashSalePrice: number | null;
                 categoryId: number;
             };
         } & {
@@ -69,6 +71,8 @@ export declare class OrdersController {
                     stock: number;
                     soldCount: number;
                     attributes: import("@prisma/client/runtime/library").JsonValue | null;
+                    isFlashSale: boolean;
+                    flashSalePrice: number | null;
                     categoryId: number;
                 };
             } & {
@@ -121,6 +125,8 @@ export declare class OrdersController {
                 stock: number;
                 soldCount: number;
                 attributes: import("@prisma/client/runtime/library").JsonValue | null;
+                isFlashSale: boolean;
+                flashSalePrice: number | null;
                 categoryId: number;
             };
         } & {

@@ -22,6 +22,11 @@ export class OrdersService {
       let totalAmount = 0;
       const orderItemsData: any[] = [];
 
+      const settings = await tx.settings.findFirst();
+      const now = new Date();
+      const isFlashSaleActive = settings && settings.flashSaleStartTime && settings.flashSaleEndTime &&
+        now >= new Date(settings.flashSaleStartTime) && now <= new Date(settings.flashSaleEndTime);
+
       for (const item of createOrderDto.items) {
         const product = await tx.product.findUnique({ where: { id: item.productId } });
         
@@ -39,7 +44,10 @@ export class OrdersService {
           data: { stock: { decrement: item.quantity } },
         });
 
-        const price = product.price;
+        const price = isFlashSaleActive && (product as any).isFlashSale && (product as any).flashSalePrice 
+          ? (product as any).flashSalePrice 
+          : product.price;
+
         totalAmount += price * item.quantity;
 
         orderItemsData.push({
@@ -49,9 +57,19 @@ export class OrdersService {
         });
       }
 
+      // TÍNH TOÁN VOLUME DISCOUNT (Mua nhiều giảm nhiều)
+      const totalItemsQuantity = createOrderDto.items.reduce((acc, item) => acc + item.quantity, 0);
+      let volumeDiscountPercent = 0;
+      if (totalItemsQuantity >= 4) volumeDiscountPercent = 0.15;
+      else if (totalItemsQuantity === 3) volumeDiscountPercent = 0.10;
+      else if (totalItemsQuantity === 2) volumeDiscountPercent = 0.05;
+
+      const volumeDiscountAmount = totalAmount * volumeDiscountPercent;
+      totalAmount = totalAmount - volumeDiscountAmount;
+
       // Calculate Shipping Fee
       let shippingFee = this.calculateShippingFee(createOrderDto.shippingProvince);
-      let discountAmount = 0;
+      let discountAmount = volumeDiscountAmount; // Include volume discount in discountAmount
 
       // Apply Voucher
       if (createOrderDto.voucherCode) {

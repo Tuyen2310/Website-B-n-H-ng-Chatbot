@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { catalogApi } from "@/lib/api";
+import { catalogApi, publicApi, PublicSettings } from "@/lib/api";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,6 +38,19 @@ export default function ProductDetailsPage() {
   const recentlyViewed = useRecentlyViewedStore((state) => state.products);
   const { user } = useAuthStore();
   const router = useRouter();
+
+  const { data: publicSettings } = useQuery<PublicSettings>({
+    queryKey: ["public-settings"],
+    queryFn: publicApi.getPublicSettings,
+  });
+
+  const isFlashSaleActive = (() => {
+    if (!publicSettings?.flashSale?.startTime || !publicSettings?.flashSale?.endTime) return false;
+    const now = new Date();
+    const start = new Date(publicSettings.flashSale.startTime);
+    const end = new Date(publicSettings.flashSale.endTime);
+    return now >= start && now <= end;
+  })();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -95,10 +108,11 @@ export default function ProductDetailsPage() {
 
   const handleAddToCart = () => {
     if (!product) return;
+    const price = isFlashSaleActive && product.isFlashSale && product.flashSalePrice ? product.flashSalePrice : product.price;
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: price,
       quantity,
       image: product.images?.[0],
     });
@@ -107,10 +121,11 @@ export default function ProductDetailsPage() {
 
   const handleBuyNow = () => {
     if (!product) return;
+    const price = isFlashSaleActive && product.isFlashSale && product.flashSalePrice ? product.flashSalePrice : product.price;
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: price,
       quantity,
       image: product.images?.[0],
     });
@@ -242,10 +257,24 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className="flex items-baseline gap-4">
-            <Price amount={product.price} className="text-5xl font-extrabold text-blue-600 tracking-tight" />
-            <span className="text-gray-400 font-bold line-through text-xl opacity-60">
-               <Price amount={product.price * 1.2} />
-            </span>
+            {isFlashSaleActive && product.isFlashSale && product.flashSalePrice ? (
+              <>
+                <Price amount={product.flashSalePrice} className="text-5xl font-extrabold text-red-500 tracking-tight" />
+                <span className="text-gray-400 font-bold line-through text-xl opacity-60">
+                   <Price amount={product.price} />
+                </span>
+                <Badge className="ml-2 bg-red-100 text-red-600 border-red-200">
+                  FLASH SALE -{Math.round((1 - product.flashSalePrice / product.price) * 100)}%
+                </Badge>
+              </>
+            ) : (
+              <>
+                <Price amount={product.price} className="text-5xl font-extrabold text-blue-600 tracking-tight" />
+                <span className="text-gray-400 font-bold line-through text-xl opacity-60">
+                   <Price amount={product.price * 1.2} />
+                </span>
+              </>
+            )}
           </div>
 
           <p className="text-gray-500 leading-relaxed text-base font-semibold max-w-xl">

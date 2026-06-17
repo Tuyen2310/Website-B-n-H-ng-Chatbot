@@ -158,7 +158,7 @@ export class MailService {
     try {
       // The frontend port is 3000 but the API host is what we use for quick-status. 
       // Quick-status endpoint will be on the backend itself (e.g. localhost:3001 or smartshop.local:3001)
-      const backendUrl = process.env.API_URL || 'http://localhost:3001'; 
+      const backendUrl = process.env.API_URL || 'http://smartshop.local:3001'; 
       const quickActionBase = `${backendUrl}/api/orders/quick-status?id=${orderDetails.id}&token=${token}&status=`;
       
       const confirmLink = quickActionBase + 'CONFIRMED';

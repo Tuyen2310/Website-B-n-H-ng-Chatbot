@@ -18,7 +18,8 @@ import {
   Search,
   Bot,
   TrendingUp,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Danh mục", icon: Menu, href: "/admin/categories" },
     { name: "Đơn hàng", icon: ShoppingBag, href: "/admin/orders" },
     { name: "Khuyến mãi", icon: Bell, href: "/admin/promotions" },
+    { name: "Flash Sale", icon: Zap, href: "/admin/flash-sale" },
     { name: "Người dùng", icon: Users, href: "/admin/users" },
     { name: "Chatbot & FAQ", icon: MessageSquare, href: "/admin/faqs" },
     { name: "Cấu hình", icon: Settings, href: "/admin/settings" },

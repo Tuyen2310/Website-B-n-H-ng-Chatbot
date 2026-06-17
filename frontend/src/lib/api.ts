@@ -6,7 +6,7 @@ const getBaseURL = () => {
     return '/api';
   }
   // Server-side (SSR): Kết nối trực tiếp đến backend NestJS cổng 3001
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  return process.env.NEXT_PUBLIC_API_URL || 'http://smartshop.local:3001/api';
 };
 
 const api = axios.create({
@@ -91,6 +91,13 @@ export interface PublicSettings {
     momoEnabled: boolean;
     momoPhone: string;
   };
+  security: {
+    maintenance: boolean;
+  };
+  flashSale?: {
+    startTime: string | null;
+    endTime: string | null;
+  };
 }
 
 export const publicApi = {
@@ -169,6 +176,17 @@ export const adminApi = {
   deleteAttribute: (id: number) => api.delete(`/attributes/${id}`).then((res) => res.data),
   getOrders: (params?: any) => api.get('/orders', { params }).then((res) => res.data),
   getCatalog: (params?: any) => api.get('/products', { params }).then((res) => res.data),
+  // Import sản phẩm từ Excel
+  importProductsExcel: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/products/import/excel', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((res) => res.data);
+  },
+  // Tải file Excel mẫu
+  downloadImportTemplate: () =>
+    api.get('/products/import/template', { responseType: 'blob' }).then((res) => res.data),
 };
 
 export const authApi = {

@@ -38,7 +38,7 @@ export default function EditPromotionPage() {
     queryFn: () => adminApi.getPromotions(),
   });
 
-  const promo = promotions?.find((p: any) => p.id.toString() === id);
+  const promo = promotions?.items?.find((p: any) => p.id.toString() === id);
 
   useEffect(() => {
     if (promo) {

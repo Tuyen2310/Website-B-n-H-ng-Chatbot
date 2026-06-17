@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { catalogApi } from '@/lib/api';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://smartshop.local:3000';
 
   let products = [];
   try {

@@ -34,14 +34,15 @@ import {
   XCircle,
   CheckCircle,
   ShoppingBag,
-  Star
+  Star,
+  Zap
 } from "lucide-react";
 import { publicApi } from "@/lib/api";
 import Link from "next/link";
 import { useSettingsStore } from "@/store/settingsStore";
 
 export default function CheckoutPage() {
-  const { items, getTotal, clearCart } = useCartStore();
+  const { items, getTotal, clearCart, getVolumeDiscountPercent } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
   const { publicSettings } = useSettingsStore();
   const router = useRouter();
@@ -217,6 +218,10 @@ export default function CheckoutPage() {
       selectedProvince
     ].filter(Boolean).join(", ");
 
+    // Total before volume discount
+    const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const volumeDiscount = subtotal * getVolumeDiscountPercent();
+
     const orderData = {
       userId: user?.id,
       items: items.map((item) => ({
@@ -224,9 +229,9 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         price: item.price
       })),
-      totalAmount: getTotal() + shippingFee - discountAmount,
+      totalAmount: subtotal - volumeDiscount + shippingFee - discountAmount,
       shippingFee,
-      discountAmount,
+      discountAmount: discountAmount + volumeDiscount, // Include volume discount in total discount for backend tracking
       paymentMethod: formData.paymentMethod,
       shippingAddress: finalAddress,
       shippingProvince: selectedProvince,
@@ -534,8 +539,14 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 <div className="flex justify-between text-sm font-bold">
                   <span className="text-gray-400">Tạm tính</span>
-                  <span className="text-gray-900 font-extrabold"><Price amount={getTotal()} /></span>
+                  <span className="text-gray-900 font-extrabold"><Price amount={items.reduce((acc, item) => acc + item.price * item.quantity, 0)} /></span>
                 </div>
+                {getVolumeDiscountPercent() > 0 && (
+                  <div className="flex justify-between text-sm font-bold text-red-500">
+                    <span className="flex items-center gap-1"><Zap className="h-4 w-4"/> Mua nhiều giảm thêm</span>
+                    <span className="font-extrabold">-<Price amount={items.reduce((acc, item) => acc + item.price * item.quantity, 0) * getVolumeDiscountPercent()} /></span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm font-bold">
                   <span className="text-gray-400">Phí vận chuyển</span>
                   <span className={discountAmount > 0 && promotion?.type === 'FREESHIP' ? "text-gray-400 line-through" : "text-gray-900 font-extrabold"}>

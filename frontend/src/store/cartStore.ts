@@ -16,6 +16,8 @@ interface CartState {
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   getTotal: () => number;
+  getVolumeDiscountPercent: () => number;
+  getTotalItems: () => number;
 }
 
 export const useCartStore = create<CartState>()(
@@ -58,8 +60,20 @@ export const useCartStore = create<CartState>()(
         });
       },
       clearCart: () => set({ items: [] }),
+      getTotalItems: () => {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+      getVolumeDiscountPercent: () => {
+        const totalItems = get().getTotalItems();
+        if (totalItems >= 4) return 0.15;
+        if (totalItems === 3) return 0.10;
+        if (totalItems === 2) return 0.05;
+        return 0;
+      },
       getTotal: () => {
-        return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
+        const subtotal = get().items.reduce((total, item) => total + item.price * item.quantity, 0);
+        const discountPercent = get().getVolumeDiscountPercent();
+        return subtotal * (1 - discountPercent);
       },
     }),
     {

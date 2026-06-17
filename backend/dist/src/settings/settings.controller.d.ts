@@ -16,6 +16,7 @@ export declare class SettingsController {
         security: {
             maintenance: any;
         };
+        flashSale: any;
     } | null>;
     getSettings(): Promise<any>;
     updateSettings(data: any): Promise<{
@@ -58,6 +59,10 @@ export declare class SettingsController {
         security: {
             twoFactor: any;
             maintenance: any;
+        };
+        flashSale: {
+            startTime: any;
+            endTime: any;
         };
     } | null>;
     clearCache(): Promise<{

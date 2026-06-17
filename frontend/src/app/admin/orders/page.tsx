@@ -18,7 +18,8 @@ import {
   Filter,
   Calendar,
   MoreVertical,
-  ChevronRight
+  ChevronRight,
+  Printer
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -88,6 +89,21 @@ export default function AdminOrdersPage() {
           <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">Quản lý đơn hàng</h1>
           <p className="text-gray-400 font-medium italic">Theo dõi toàn bộ lịch sử giao dịch và vận chuyển.</p>
         </div>
+        <Button 
+            className="rounded-2xl h-14 px-8 font-black bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-100 gap-2 text-white"
+            onClick={() => {
+                const query = new URLSearchParams({
+                    status: selectedStatus,
+                    payment: paymentFilter,
+                    start: startDate,
+                    end: endDate,
+                    search: searchTerm
+                }).toString();
+                window.open(`/admin/orders/bulk-print?${query}`, '_blank');
+            }}
+        >
+            <Printer className="h-5 w-5" /> In hàng loạt
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-100/50">

@@ -79,6 +79,8 @@ model Product {
   soldCount   Int      @default(0)
   categoryId  Int
   attributes  Json?    // Flexible attributes like color, storage, etc.
+  isFlashSale Boolean  @default(false)
+  flashSalePrice Float?
   isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -240,6 +242,9 @@ model Settings {
   // Security
   maintenance     Boolean  @default(false)
   twoFactor       Boolean  @default(false)
+  // Flash Sale
+  flashSaleStartTime DateTime?
+  flashSaleEndTime   DateTime?
   // Metadata
   updatedAt       DateTime @updatedAt
 }

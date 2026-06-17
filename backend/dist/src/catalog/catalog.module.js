@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CatalogModule = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const categories_service_1 = require("./categories/categories.service");
 const categories_controller_1 = require("./categories/categories.controller");
 const products_service_1 = require("./products/products.service");
@@ -17,8 +18,11 @@ let CatalogModule = class CatalogModule {
 exports.CatalogModule = CatalogModule;
 exports.CatalogModule = CatalogModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            platform_express_1.MulterModule.register({}),
+        ],
         providers: [categories_service_1.CategoriesService, products_service_1.ProductsService],
-        controllers: [categories_controller_1.CategoriesController, products_controller_1.ProductsController]
+        controllers: [categories_controller_1.CategoriesController, products_controller_1.ProductsController],
     })
 ], CatalogModule);
 //# sourceMappingURL=catalog.module.js.map

@@ -115,14 +115,19 @@ async function main() {
                 `https://picsum.photos/seed/${safeSeed}_${i}_detail1/800/800`,
                 `https://picsum.photos/seed/${safeSeed}_${i}_detail2/800/800`,
             ];
+            const isFlash = Math.random() > 0.7;
+            const originalPrice = Math.floor(Math.random() * 5000000) + 100000;
+            const fSalePrice = isFlash ? Math.floor(originalPrice * 0.8) : null;
             await prisma.product.create({
                 data: {
                     name: productName,
-                    price: Math.floor(Math.random() * 5000000) + 100000,
+                    price: originalPrice,
                     description: `Đây là thông tin mô tả chi tiết cho ${productName}. Sản phẩm được bảo hành chính hãng và đi kèm nhiều phụ kiện hấp dẫn. Hãy đặt mua ngay hôm nay để nhận ưu đãi!`,
                     stock: Math.floor(Math.random() * 100) + 10,
                     categoryId: category.id,
                     images: images,
+                    isFlashSale: isFlash,
+                    flashSalePrice: fSalePrice,
                     attributes: {
                         brand: "Thương hiệu Demo",
                         origin: "Việt Nam",

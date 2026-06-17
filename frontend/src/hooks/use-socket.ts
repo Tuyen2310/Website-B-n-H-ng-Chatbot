@@ -13,7 +13,7 @@ export const useSocket = () => {
         const hostname = window.location.hostname;
         return `http://${hostname}:3001`;
       }
-      return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3001';
+      return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://smartshop.local:3001';
     };
     const socketUrl = getSocketUrl();
     

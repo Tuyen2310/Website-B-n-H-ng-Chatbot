@@ -36,7 +36,7 @@ export class AuthController {
     // This triggers the validate method in GoogleStrategy, which then attaches user to req
     const jwt = await this.authService.validateOAuthLogin(req.user);
     // Redirect back to frontend with the token
-    const frontendUrl = 'http://localhost:3000/auth/callback';
+    const frontendUrl = 'http://smartshop.local:3000/auth/callback';
     return res.redirect(`${frontendUrl}?token=${jwt.access_token}&user=${encodeURIComponent(JSON.stringify(jwt.user))}`);
   }
 }
