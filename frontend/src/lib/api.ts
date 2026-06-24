@@ -6,7 +6,11 @@ const getBaseURL = () => {
     return '/api';
   }
   // Server-side (SSR): Kết nối trực tiếp đến backend NestJS cổng 3001
-  return process.env.NEXT_PUBLIC_API_URL || 'http://smartshop.local:3001/api';
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (envUrl) {
+    return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
+  }
+  return 'http://smartshop.local:3001/api';
 };
 
 const api = axios.create({
