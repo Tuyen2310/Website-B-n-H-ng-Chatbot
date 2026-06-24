@@ -8,6 +8,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   allowedDevOrigins: ['smartshop.local', 'smartshop.local:3000'],
   
   // Cho phép Next.js tự động tối ưu hóa ảnh (resize, WebP/AVIF conversion)

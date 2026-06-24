@@ -188,7 +188,7 @@ export default function CheckoutPage() {
       toast.success("Đơn hàng đã được khởi tạo!");
       clearCart();
       
-      if (formData.paymentMethod === 'E_WALLET') {
+      if (formData.paymentMethod === 'E_WALLET' || formData.paymentMethod === 'BANK') {
          try {
             const { paymentUrl } = await paymentApi.createPaymentLink(data.id, formData.paymentMethod);
             router.push(paymentUrl);
@@ -406,39 +406,6 @@ export default function CheckoutPage() {
                   </div>
                 )}
               </RadioGroup>
-
-              {formData.paymentMethod === "BANK" && publicSettings?.payment && (
-                <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-col md:flex-row gap-6 animate-fade-in-up items-center">
-                  <div className="flex-1 space-y-3 w-full">
-                    <h4 className="font-bold text-blue-900 uppercase text-sm tracking-wider flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4" /> Thông tin chuyển khoản
-                    </h4>
-                    <div className="grid grid-cols-[120px_1fr] gap-2">
-                      <span className="text-sm font-medium text-gray-500">Ngân hàng:</span>
-                      <span className="text-sm font-bold text-gray-900">{publicSettings.payment.bankId}</span>
-                      
-                      <span className="text-sm font-medium text-gray-500">Số tài khoản:</span>
-                      <span className="text-lg font-black text-blue-700 font-mono tracking-wider">{publicSettings.payment.accountNo}</span>
-                      
-                      <span className="text-sm font-medium text-gray-500">Chủ tài khoản:</span>
-                      <span className="text-sm font-bold text-gray-900 uppercase">{publicSettings.payment.accountName}</span>
-                    </div>
-                    <div className="p-3 bg-yellow-50 rounded-xl border border-yellow-100 mt-2">
-                      <p className="text-xs text-yellow-800 font-medium">
-                        * Vui lòng quét mã QR hoặc chuyển khoản với nội dung: <br/>
-                        <span className="font-black">Thanh toan don hang {user?.id || 'GUEST'}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="w-40 h-40 bg-white rounded-2xl shadow-md border border-gray-100 p-2 shrink-0">
-                    <img 
-                      src={`https://img.vietqr.io/image/${publicSettings.payment.bankId}-${publicSettings.payment.accountNo}-compact2.jpg?amount=${getTotal() + shippingFee - discountAmount}&accountName=${encodeURIComponent(publicSettings.payment.accountName || '')}&addInfo=${encodeURIComponent('Thanh toan don hang ' + (user?.id || 'GUEST'))}`}
-                      alt="VietQR"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                </div>
-              )}
             </section>
           </form>
 

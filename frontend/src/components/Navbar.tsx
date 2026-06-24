@@ -65,6 +65,14 @@ export default function Navbar() {
   const shopName = (settings as any)?.general?.shopName || "CommercePro";
   const shopLogo = (settings as any)?.general?.logo;
 
+  const isFlashSaleActive = (() => {
+    if (!(settings as any)?.flashSale?.startTime || !(settings as any)?.flashSale?.endTime) return false;
+    const now = new Date();
+    const start = new Date((settings as any).flashSale.startTime);
+    const end = new Date((settings as any).flashSale.endTime);
+    return now >= start && now <= end;
+  })();
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 navbar-premium ${
       isScrolled ? "navbar-scrolled" : "py-6"
@@ -101,6 +109,17 @@ export default function Navbar() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {isFlashSaleActive && (
+            <Link href="/shop?flashSale=true" className="navbar-link flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+              <Bot className="h-4 w-4 animate-pulse hidden" />
+              <span className="relative flex h-2 w-2 mr-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              Flash Sale
+            </Link>
+          )}
 
           <Link href="/support" className="navbar-link">Hỗ trợ</Link>
         </div>
@@ -195,6 +214,17 @@ export default function Navbar() {
                 ))}
               </div>
             </div>
+            
+            {isFlashSaleActive && (
+              <Link href="/shop?flashSale=true" className="flex items-center gap-2 text-lg font-black text-red-500" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                Flash Sale
+              </Link>
+            )}
+
             <Link href="/support" className="text-lg font-black text-slate-900 dark:text-white" onClick={() => setIsMobileMenuOpen(false)}>Hỗ trợ</Link>
           </div>
         </div>

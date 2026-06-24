@@ -102,8 +102,27 @@ export default function ProductDetailsPage() {
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("Đã sao chép liên kết sản phẩm vào khay nhớ tạm!");
+    const url = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url)
+        .then(() => toast.success("Đã sao chép liên kết sản phẩm vào khay nhớ tạm!"))
+        .catch(() => toast.error("Không thể sao chép liên kết!"));
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = url;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast.success("Đã sao chép liên kết sản phẩm vào khay nhớ tạm!");
+      } catch (err) {
+        toast.error("Trình duyệt của bạn không hỗ trợ sao chép!");
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   const handleAddToCart = () => {

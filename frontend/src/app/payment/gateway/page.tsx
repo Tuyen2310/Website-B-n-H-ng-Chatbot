@@ -116,17 +116,34 @@ function PaymentGatewayInner() {
           
           <CardFooter className="p-8 pt-0 flex flex-col gap-3">
             <Button 
-              className="w-full h-14 rounded-2xl text-lg font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-600/20"
-              onClick={() => router.push(`/orders/${orderId}`)}
+              className="w-full h-14 rounded-2xl text-lg font-black uppercase tracking-widest bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/20 flex items-center gap-2"
+              onClick={async () => {
+                try {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/payment/webhook`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentId, status: 'SUCCESS' })
+                  });
+                  if (res.ok) {
+                    alert('Thanh toán thành công! Trạng thái đơn hàng đã được cập nhật.');
+                    router.push(`/orders/${orderId}`);
+                  } else {
+                    alert('Có lỗi xảy ra khi giả lập thanh toán.');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  alert('Lỗi kết nối đến server.');
+                }
+              }}
             >
-              Tôi đã chuyển khoản xong
+              <ShieldCheck className="h-5 w-5" /> Giả lập Thanh toán thành công
             </Button>
             <Button 
               variant="ghost" 
               className="w-full h-14 rounded-2xl text-sm font-bold text-gray-400 hover:text-red-500 hover:bg-red-50"
               onClick={() => router.push(`/orders/${orderId}`)}
             >
-              Hủy giao dịch
+              Quay lại chi tiết đơn hàng
             </Button>
           </CardFooter>
         </Card>
