@@ -73,7 +73,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace(/\\/api\\/?$/, '') : 'http://localhost:3001'}/api/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL.slice(0, -4) : process.env.NEXT_PUBLIC_API_URL) : 'http://localhost:3001'}/api/:path*`,
       },
     ];
   },
