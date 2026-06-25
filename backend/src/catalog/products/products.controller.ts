@@ -110,6 +110,16 @@ export class ProductsController {
     return this.productsService.importFromExcel(file.buffer);
   }
 
+  @Post('bulk-delete')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete multiple products (Admin only)' })
+  @ApiBody({ schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'number' } } } } })
+  bulkRemove(@Body('ids') ids: number[]) {
+    return this.productsService.bulkRemove(ids);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {

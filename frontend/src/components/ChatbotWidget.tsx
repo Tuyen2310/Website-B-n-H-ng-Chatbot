@@ -4,9 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, X, Send, Bot, User, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Sparkles, RotateCcw } from "lucide-react";
 import { catalogApi } from "@/lib/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useCartStore } from "@/store/cartStore";
+import { toast } from "sonner";
+import Link from "next/link";
 
 interface Message {
   role: "user" | "bot";
@@ -14,12 +17,78 @@ interface Message {
   suggestions?: string[];
 }
 
+const ChatProductCard = ({ id }: { id: number }) => {
+  const { data: product, isLoading } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => catalogApi.getProduct(id),
+    staleTime: 1000 * 60 * 5
+  });
+  
+  if (isLoading) {
+    return (
+      <div className="my-3 p-4 border border-[#0044CC]/20 rounded-[1.5rem] bg-white animate-pulse">
+        <div className="flex gap-4">
+          <div className="w-20 h-20 bg-gray-200 rounded-xl shrink-0"></div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-8 bg-gray-200 rounded mt-2"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) return null;
+
+  return (
+    <div className="my-3 p-3 border-2 border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-[1.5rem] bg-gradient-to-br from-white to-[#F9F9FF] group hover:shadow-[0_10px_40px_rgba(0,68,204,0.15)] transition-all">
+      <div className="flex gap-4 items-center">
+        <Link href={`/shop/${product.id}`} className="w-24 h-24 rounded-xl overflow-hidden bg-gray-50 shrink-0 relative border border-gray-100 shadow-sm block">
+          <img src={product.images?.[0] || 'https://via.placeholder.com/150'} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        </Link>
+        <div className="flex-1 flex flex-col justify-center">
+          <Link href={`/shop/${product.id}`}>
+            <h4 className="font-bold text-[#041B3C] text-sm line-clamp-2 leading-tight mb-1 hover:text-[#0044CC] transition-colors">{product.name}</h4>
+          </Link>
+          <span className="text-[#0044CC] font-black text-sm">
+            {product.price.toLocaleString('vi-VN')}đ
+          </span>
+        </div>
+      </div>
+      <button 
+        onClick={(e) => {
+          e.preventDefault();
+          useCartStore.getState().addItem({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.images?.[0] || '',
+            quantity: 1
+          });
+          toast.success('Đã thêm vào giỏ hàng!');
+        }}
+        className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#003399] to-[#0066FF] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#0044CC]/20 hover:shadow-xl hover:-translate-y-0.5 hover:from-[#002277] hover:to-[#0044CC] transition-all active:scale-95"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Mua Ngay
+      </button>
+    </div>
+  );
+};
+
 const MarkdownText = ({ text }: { text: string }) => {
   // Detect images: ![alt](url)
   const imageRegex = /!\[(.*?)\]\((.*?)\)/g;
   
+  // Detect PRODUCT_CARD tags
+  const productCardRegex = /\[PRODUCT_CARD:(\d+)\]/g;
+  
+  // Replace PRODUCT_CARD tags with a unique token so we can split it safely
+  const processedText = text.replace(productCardRegex, '___PRODUCT_CARD_$1___');
+  
   // Split the text by images first
-  const sections = text.split(imageRegex);
+  const sections = processedText.split(imageRegex);
   // sections will look like: [textBefore, alt, url, textAfter, alt, url, ...]
 
   const renderContent = (content: string) => {
@@ -33,7 +102,7 @@ const MarkdownText = ({ text }: { text: string }) => {
           const isBullet = /^[*-]\s/.test(line.trim());
           const cleanLine = isBullet ? line.trim().substring(2) : line;
           
-          const parts = cleanLine.split(/(\*\*.*?\*\*|\*.*?\*|\[.*?\]\(.*?\))/g);
+          const parts = cleanLine.split(/(\*\*.*?\*\*|\*.*?\*|\[.*?\]\(.*?\)|___PRODUCT_CARD_\d+___)/g);
           
           return (
             <div key={idx} className={`relative ${isBullet ? 'pl-6' : ''}`}>
@@ -42,6 +111,10 @@ const MarkdownText = ({ text }: { text: string }) => {
               )}
               <div className="min-h-[1.5em] leading-relaxed">
                 {parts.map((part, i) => {
+                  if (part.startsWith('___PRODUCT_CARD_') && part.endsWith('___')) {
+                    const productId = parseInt(part.replace('___PRODUCT_CARD_', '').replace('___', ''));
+                    return <ChatProductCard key={i} id={productId} />;
+                  }
                   if (part.startsWith('**') && part.endsWith('**')) {
                     return <strong key={i} className="font-black text-[#041B3C] border-b-2 border-[#0044CC]/20">{part.slice(2, -2)}</strong>;
                   }
@@ -52,14 +125,34 @@ const MarkdownText = ({ text }: { text: string }) => {
                       const linkText = part.match(/\[(.*?)\]/)?.[1] || "";
                       const linkUrl = part.match(/\((.*?)\)/)?.[1] || "#";
                       
-                      const isActionLink = linkText.toLowerCase().includes("xem chi tiết") || linkText.toLowerCase().includes("mua") || linkText.toLowerCase().includes("ngay");
+                      const isActionLink = linkText.toLowerCase().includes("xem chi tiết") || linkText.toLowerCase().includes("mua") || linkText.toLowerCase().includes("ngay") || linkText.toLowerCase().includes("thêm vào giỏ");
                       
                       if (isActionLink) {
                         return (
                           <div key={i} className="mt-3 mb-2">
-                            <a href={linkUrl} className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#003399] to-[#0066FF] text-white text-sm font-bold rounded-[1rem] shadow-lg shadow-[#0044CC]/20 hover:shadow-xl hover:-translate-y-0.5 hover:from-[#002277] hover:to-[#0044CC] transition-all w-full text-center group/btn">
+                            <button 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (linkUrl.startsWith('add-to-cart:')) {
+                                  const id = linkUrl.split(':')[1];
+                                  catalogApi.getProduct(Number(id)).then(data => {
+                                    useCartStore.getState().addItem({
+                                      id: data.id,
+                                      name: data.name,
+                                      price: data.price,
+                                      image: data.images?.[0] || '',
+                                      quantity: 1
+                                    });
+                                    toast.success('Đã thêm sản phẩm vào giỏ hàng!');
+                                  }).catch(() => toast.error('Lỗi khi thêm vào giỏ hàng'));
+                                } else {
+                                  window.location.href = linkUrl;
+                                }
+                              }}
+                              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#003399] to-[#0066FF] text-white text-sm font-bold rounded-[1rem] shadow-lg shadow-[#0044CC]/20 hover:shadow-xl hover:-translate-y-0.5 hover:from-[#002277] hover:to-[#0044CC] transition-all w-full text-center group/btn"
+                            >
                               {linkText} <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
-                            </a>
+                            </button>
                           </div>
                         );
                       }
@@ -135,7 +228,7 @@ export default function ChatbotWidget() {
   const mutation = useMutation({
     mutationFn: (msg: string) => catalogApi.sendMessage(msg),
     onSuccess: (data) => {
-      setMessages((prev) => [...prev, { role: "bot", content: data.response }]);
+      setMessages((prev) => [...prev, { role: "bot", content: data.response, suggestions: data.suggestions }]);
     },
     onError: () => {
       setMessages((prev) => [...prev, { role: "bot", content: "Xin lỗi, tôi đang gặp sự cố kỹ thuật. Vui lòng thử lại sau hoặc liên hệ hỗ trợ." }]);
@@ -150,6 +243,14 @@ export default function ChatbotWidget() {
     setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
     setInput("");
     mutation.mutate(userMsg);
+  };
+
+  const handleEndChat = () => {
+    setMessages([{ 
+      role: "bot", 
+      content: "Cảm ơn Quý khách đã trò chuyện cùng CommercePro. Nếu cần hỗ trợ thêm, hãy nhắn lại bất cứ lúc nào nhé. Chúc Quý khách một ngày tốt lành! ✨",
+      suggestions: faqs?.slice(0, 6).map((f: any) => f.question) || []
+    }]);
   };
 
   return (
@@ -172,9 +273,14 @@ export default function ChatbotWidget() {
                 </div>
               </div>
             </CardTitle>
-            <Button variant="ghost" size="icon" className="text-white/20 hover:text-white hover:bg-white/10 h-10 w-10 rounded-lg relative z-10 transition-all" onClick={() => setIsOpen(false)}>
-              <X className="h-6 w-6" />
-            </Button>
+            <div className="flex items-center gap-1 relative z-10">
+              <Button variant="ghost" size="icon" title="Làm mới hội thoại" className="text-white/40 hover:text-white hover:bg-white/10 h-10 w-10 rounded-lg transition-all" onClick={handleEndChat}>
+                <RotateCcw className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="text-white/20 hover:text-white hover:bg-white/10 h-10 w-10 rounded-lg transition-all" onClick={() => setIsOpen(false)}>
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
           </CardHeader>
 
           <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F9F9FF] scrollbar-hide" ref={scrollRef}>

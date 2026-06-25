@@ -85,6 +85,42 @@ export default function AdminFaqsPage() {
     enabled: activeTab === "logs"
   });
 
+  const { data: chatbotStats } = useQuery({
+    queryKey: ["admin-chatbot-stats"],
+    queryFn: () => adminApi.getChatbotStats(),
+  });
+
+  const handleExportCSV = () => {
+    if (!chatbotLogs || chatbotLogs.length === 0) {
+      toast.error("Không có dữ liệu để xuất");
+      return;
+    }
+    
+    // Create CSV content
+    const headers = ["Thời gian", "Khách hàng", "Câu hỏi", "Chatbot phản hồi"];
+    const csvContent = [
+      headers.join(","),
+      ...chatbotLogs.map((log: any) => {
+        const date = new Date(log.createdAt).toLocaleString("vi-VN").replace(/,/g, '');
+        const user = log.userId ? `User #${log.userId}` : "Khách vãng lai";
+        const question = `"${log.question.replace(/"/g, '""')}"`;
+        const answer = `"${log.answer.replace(/"/g, '""')}"`;
+        return `${date},${user},${question},${answer}`;
+      })
+    ].join("\n");
+
+    // Add BOM for UTF-8 Excel support
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `chatbot_logs_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Đã xuất báo cáo CSV");
+  };
+
   // Mutations
   const createMutation = useMutation({
     mutationFn: (data: any) => catalogApi.createFaq(data),
@@ -181,12 +217,20 @@ export default function AdminFaqsPage() {
                     Lịch sử chat
                 </Button>
             </div>
-            {activeTab === "faqs" && (
+            {activeTab === "faqs" ? (
                 <Button 
                     className="rounded-2xl h-14 px-8 font-black shadow-xl shadow-primary/20 gap-2"
                     onClick={() => handleOpenModal()}
                 >
                     <Plus className="h-5 w-5" /> Thêm FAQ
+                </Button>
+            ) : (
+                <Button 
+                    variant="outline"
+                    className="rounded-2xl h-14 px-8 font-black shadow-lg border-primary/20 text-primary gap-2 bg-indigo-50/50 hover:bg-indigo-100"
+                    onClick={handleExportCSV}
+                >
+                    <Save className="h-5 w-5" /> Xuất báo cáo (CSV)
                 </Button>
             )}
         </div>
@@ -204,7 +248,7 @@ export default function AdminFaqsPage() {
                         </div>
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300 mb-1">Tổng số câu hỏi</p>
-                            <h3 className="text-2xl font-black">{faqs?.length || 0}</h3>
+                            <h3 className="text-2xl font-black">{chatbotStats?.totalFaqs || faqs?.length || 0}</h3>
                         </div>
                     </div>
                 </div>
@@ -214,7 +258,7 @@ export default function AdminFaqsPage() {
                     </div>
                     <div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Tỷ lệ phản hồi đúng</p>
-                        <h3 className="text-2xl font-black text-gray-900">98.5%</h3>
+                        <h3 className="text-2xl font-black text-gray-900">{chatbotStats?.correctResponseRate || '98.5'}%</h3>
                     </div>
                 </div>
                 <div className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-xl shadow-gray-100/50 flex items-center gap-4">
@@ -223,7 +267,7 @@ export default function AdminFaqsPage() {
                     </div>
                     <div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Lượt tương tác / ngày</p>
-                        <h3 className="text-2xl font-black text-gray-900">1,240</h3>
+                        <h3 className="text-2xl font-black text-gray-900">{chatbotStats?.interactionsToday || 0}</h3>
                     </div>
                 </div>
             </div>

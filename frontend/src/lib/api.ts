@@ -10,7 +10,7 @@ const getBaseURL = () => {
   if (envUrl) {
     return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
   }
-  return 'http://smartshop.local:3001/api';
+  return 'http://smartshop.local:3000/api';
 };
 
 const api = axios.create({
@@ -119,7 +119,23 @@ export const catalogApi = {
   getOrders: (params?: any) => api.get('/orders', { params }).then((res) => res.data),
   getMyOrders: (params?: any) => api.get('/orders', { params }).then((res) => res.data),
   getOrderById: (id: number) => api.get(`/orders/${id}`).then((res) => res.data),
-  sendMessage: (message: string) => api.post('/chatbot/chat', { message }).then((res) => res.data),
+  sendMessage: (message: string) => {
+    // Vượt qua proxy của Next.js (có timeout mặc định 30s) bằng cách gọi trực tiếp backend
+    let directBaseURL = 'http://127.0.0.1:3001/api';
+    if (typeof window !== 'undefined') {
+      // Lấy chính xác tên miền/IP hiện tại (localhost, IP mạng LAN, hoặc smartshop.local) ghép với port 3001 (Backend)
+      directBaseURL = `${window.location.protocol}//${window.location.hostname}:3001/api`;
+    }
+    const envUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (envUrl) {
+      directBaseURL = envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
+    }
+    
+    return api.post('/chatbot/chat', { message }, { 
+      baseURL: directBaseURL,
+      timeout: 120000 // Tăng timeout lên 120s chờ AI
+    }).then((res) => res.data);
+  },
   getFaqs: () => api.get('/faqs').then((res) => res.data),
   createFaq: (data: any) => api.post('/faqs', data).then((res) => res.data),
   updateFaq: (id: number, data: any) => api.patch(`/faqs/${id}`, data).then((res) => res.data),
@@ -149,6 +165,7 @@ export const paymentApi = {
 export const adminApi = {
   getUsers: (params?: any) => api.get('/users', { params }).then((res) => res.data),
   getChatbotLogs: () => api.get('/admin/chatbot-logs').then((res) => res.data),
+  getChatbotStats: () => api.get('/admin/chatbot-stats').then((res) => res.data),
   createUser: (data: any) => api.post('/users', data).then((res) => res.data),
   updateUser: (id: number, data: any) => api.patch(`/users/${id}`, data).then((res) => res.data),
   deleteUser: (id: number) => api.delete(`/users/${id}`).then((res) => res.data),
@@ -188,6 +205,7 @@ export const adminApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((res) => res.data);
   },
+  bulkDeleteProducts: (ids: number[]) => api.post('/products/bulk-delete', { ids }).then((res) => res.data),
   // Tải file Excel mẫu
   downloadImportTemplate: () =>
     api.get('/products/import/template', { responseType: 'blob' }).then((res) => res.data),

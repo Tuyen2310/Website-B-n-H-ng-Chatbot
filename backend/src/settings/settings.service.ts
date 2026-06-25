@@ -27,7 +27,7 @@ export class SettingsService implements OnModuleInit {
           accountNo: '1234567890',
           accountName: 'CONG TY TNHH ANTIGRAVITY',
           chatbotEnabled: true,
-          chatbotModel: 'gemini-1.5-flash',
+          chatbotModel: 'gemini-2.5-flash',
           chatbotWelcome: 'Xin chào! Tôi là trợ lý ảo CommercePro. Tôi có thể giúp gì cho bạn hôm nay?',
         } as any,
       });

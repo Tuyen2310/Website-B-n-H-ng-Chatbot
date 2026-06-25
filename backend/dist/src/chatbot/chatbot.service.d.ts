@@ -10,6 +10,10 @@ export declare class ChatbotService implements OnModuleInit {
     constructor(prisma: PrismaService, configService: ConfigService);
     onModuleInit(): void;
     chat(message: string, userId?: number): Promise<{
+        response: string;
+        suggestions?: undefined;
+    } | {
         response: any;
+        suggestions: string[];
     }>;
 }

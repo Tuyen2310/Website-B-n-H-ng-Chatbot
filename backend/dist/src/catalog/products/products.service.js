@@ -129,6 +129,12 @@ let ProductsService = class ProductsService {
             data: { isDeleted: true },
         });
     }
+    async bulkRemove(ids) {
+        return this.prisma.product.updateMany({
+            where: { id: { in: ids } },
+            data: { isDeleted: true },
+        });
+    }
     generateExcelTemplate() {
         const workbook = XLSX.utils.book_new();
         const guideData = [

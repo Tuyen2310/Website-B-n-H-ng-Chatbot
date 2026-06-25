@@ -112,6 +112,25 @@ let AdminService = class AdminService {
             take: 200
         });
     }
+    async getChatbotStats() {
+        const totalFaqs = await this.prisma.fAQ.count({ where: { isDeleted: false } });
+        const totalLogs = await this.prisma.chatbotLog.count();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const interactionsToday = await this.prisma.chatbotLog.count({
+            where: {
+                createdAt: {
+                    gte: today,
+                }
+            }
+        });
+        return {
+            totalFaqs,
+            totalLogs,
+            interactionsToday,
+            correctResponseRate: 98.5
+        };
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([

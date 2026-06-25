@@ -154,9 +154,11 @@ async function generateExcel(testResults, summary) {
     'UT-01': 'Xác thực người dùng (Login)',
     'UT-02': 'Xem danh sách sản phẩm (GET Products)',
     'UT-03': 'Xem danh mục sản phẩm (GET Categories)',
+    'UT-04': 'Đăng ký người dùng (Register)',
     'IT-01': 'Tích hợp Auth Module với User Module',
     'IT-02': 'Tích hợp Product Module với Category Module',
     'IT-03': 'Tích hợp Promotion Module với Order Module',
+    'IT-04': 'Tích hợp Giỏ hàng và Thanh toán',
     'ST-01': 'Đặt hàng không cần đăng nhập (Guest Checkout)',
     'ST-02': 'Admin xem Dashboard (Login → Get Stats)',
     'ST-03': 'AI Chatbot tư vấn sản phẩm end-to-end',
@@ -166,9 +168,11 @@ async function generateExcel(testResults, summary) {
     'UT-01': 'HTTP 200 và access_token hợp lệ',
     'UT-02': 'HTTP 200, trả về mảng items và tổng số total',
     'UT-03': 'HTTP 200, trả về mảng danh mục không rỗng',
+    'UT-04': 'HTTP 201 và tạo thành công',
     'IT-01': 'HTTP 200, trả về thông tin user với email và role chính xác',
     'IT-02': 'HTTP 200, danh sách sản phẩm lọc đúng theo categoryId=1',
     'IT-03': 'HTTP 200 nếu mã hợp lệ; HTTP 404 nếu mã không tồn tại',
+    'IT-04': 'HTTP 201, tạo đơn hàng thành công',
     'ST-01': 'HTTP 201, tạo đơn hàng mới với status PENDING',
     'ST-02': 'HTTP 200, trả về totalRevenue, totalOrders, totalProducts, totalUsers',
     'ST-03': 'HTTP 200, AI trả về câu trả lời không rỗng',
@@ -241,8 +245,8 @@ async function generateExcel(testResults, summary) {
 
   const summaryData = [
     ['Loại Kiểm thử', 'Tổng TC', 'Số PASS', 'Số FAIL'],
-    ['Unit Test', 3, testResults.filter(r=>r.id.startsWith('UT')&&r.status==='PASS').length, testResults.filter(r=>r.id.startsWith('UT')&&r.status==='FAIL').length],
-    ['Integration Test', 3, testResults.filter(r=>r.id.startsWith('IT')&&r.status==='PASS').length, testResults.filter(r=>r.id.startsWith('IT')&&r.status==='FAIL').length],
+    ['Unit Test', 4, testResults.filter(r=>r.id.startsWith('UT')&&r.status==='PASS').length, testResults.filter(r=>r.id.startsWith('UT')&&r.status==='FAIL').length],
+    ['Integration Test', 4, testResults.filter(r=>r.id.startsWith('IT')&&r.status==='PASS').length, testResults.filter(r=>r.id.startsWith('IT')&&r.status==='FAIL').length],
     ['System Test', 3, testResults.filter(r=>r.id.startsWith('ST')&&r.status==='PASS').length, testResults.filter(r=>r.id.startsWith('ST')&&r.status==='FAIL').length],
     ['TỔNG CỘNG', testResults.length, testResults.filter(r=>r.status==='PASS').length, testResults.filter(r=>r.status==='FAIL').length],
   ];
@@ -269,5 +273,13 @@ async function generateExcel(testResults, summary) {
     });
   });
 
-  await workbook.xlsx.writeFile(outputExcel);
+  try {
+    await workbook.xlsx.writeFile(outputExcel);
+  } catch (err) {
+    if (err.code === 'EBUSY') {
+      console.log('\n⚠️ KHÔNG THỂ LƯU BÁO CÁO EXCEL: Vui lòng đóng file SmartShop_TestReport.xlsx nếu đang mở rồi chạy lại!');
+    } else {
+      console.log('\n⚠️ Lỗi lưu file Excel:', err.message);
+    }
+  }
 }

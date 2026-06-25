@@ -6,14 +6,14 @@ export declare class UsersService {
     private mailService;
     constructor(prisma: PrismaService, mailService: MailService);
     create(data: Prisma.UserCreateInput): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;
@@ -31,10 +31,10 @@ export declare class UsersService {
         address?: string;
         role?: Role;
     }): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
         phone: string | null;
         address: string | null;
@@ -49,14 +49,14 @@ export declare class UsersService {
     }>;
     findAll(skip?: number, take?: number): Promise<{
         items: {
+            id: number;
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
             email: string;
-            password: string | null;
             phone: string | null;
             address: string | null;
+            password: string | null;
             role: import(".prisma/client").$Enums.Role;
             isBlocked: boolean;
             points: number;
@@ -69,14 +69,14 @@ export declare class UsersService {
         total: number;
     }>;
     findOneByEmail(email: string): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;
@@ -87,14 +87,14 @@ export declare class UsersService {
         isVerified: boolean;
     } | null>;
     findOneById(id: number): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;
@@ -111,14 +111,14 @@ export declare class UsersService {
         role?: Role;
         isBlocked?: boolean;
     }): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;
@@ -129,14 +129,14 @@ export declare class UsersService {
         isVerified: boolean;
     }>;
     remove(id: number): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;

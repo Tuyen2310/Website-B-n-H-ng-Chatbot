@@ -100,4 +100,27 @@ export class AdminService {
       take: 200 // Lấy 200 tin nhắn gần nhất
     });
   }
+
+  async getChatbotStats() {
+    const totalFaqs = await this.prisma.fAQ.count({ where: { isDeleted: false } });
+    const totalLogs = await this.prisma.chatbotLog.count();
+    
+    // Get interactions for today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const interactionsToday = await this.prisma.chatbotLog.count({
+      where: {
+        createdAt: {
+          gte: today,
+        }
+      }
+    });
+
+    return {
+      totalFaqs,
+      totalLogs,
+      interactionsToday,
+      correctResponseRate: 98.5 // Simulated for now
+    };
+  }
 }

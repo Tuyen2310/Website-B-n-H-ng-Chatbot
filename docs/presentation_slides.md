@@ -1,167 +1,176 @@
-# Nội dung Slide Thuyết Trình Đồ Án Tốt Nghiệp
+# 🎓 Kịch Bản Thuyết Trình Đồ Án Tốt Nghiệp
 
-Dưới đây là nội dung chi tiết cho 12 slide thuyết trình, được chắt lọc từ báo cáo file Word và thực tế hệ thống. Bạn có thể copy nội dung này trực tiếp vào PowerPoint.
+Dưới đây là nội dung chi tiết cho 12 slide thuyết trình, được chắt lọc và trình bày ngắn gọn, súc tích (dạng Bullet points) để hội đồng dễ theo dõi. Đồng thời mình có ghi chú cụ thể các ảnh bạn cần chụp để đưa vào slide nhé.
 
 ---
 
-## Slide 1 – Trang bìa
+## 1. Slide 1 – Trang bìa
+*Trang trình bày đầu tiên, thiết kế trang trọng, lịch sự*
 
-**XÂY DỰNG WEBSITE BÁN HÀNG TÍCH HỢP CHATBOT TƯ VẤN SẢN PHẨM DỰA TRÊN TẬP CÂU HỎI SẴN CÓ**
-
+- **TRƯỜNG ĐẠI HỌC CÔNG NGHỆ ĐÔNG Á**
+- **Khoa:** Công Nghệ Thông Tin
+- **TÊN ĐỀ TÀI:** XÂY DỰNG WEBSITE BÁN HÀNG TÍCH HỢP CHATBOT TƯ VẤN SẢN PHẨM DỰA TRÊN TẬP CÂU HỎI SẴN CÓ
+- **Sinh viên thực hiện:** Hoàng Văn Tuyên (Mã SV: 20220594)
 - **Giảng viên hướng dẫn:** ThS. Lưu Thị Thảo
-- **Sinh viên thực hiện:** Hoàng Văn Tuyên (MSSV: 20220594 - Lớp: DCCNTT13.10.4)
-- **Trường/Khoa:** Trường Đại học Công Nghệ Đông Á / Khoa Công Nghệ Thông Tin
-- **Thời gian:** Bắc Ninh, Năm 2026
+- **Thời gian:** Bắc Ninh, năm 2026
 
 ---
 
-## Slide 2 – Giới thiệu đề tài
+## 2. Slide 2 – Giới thiệu đề tài
+*Nhấn mạnh vào lý do và bối cảnh thực tế dẫn đến việc chọn đề tài*
 
-**Giới thiệu đề tài**
+**Bối cảnh thực tế:**
+- Thương mại điện tử bùng nổ, mua sắm trực tuyến thành xu hướng.
+- Người dùng có nhu cầu rất lớn về việc được giải đáp thắc mắc liên tục 24/7 (size, màu sắc, bảo hành, ship...).
+- Tư vấn thủ công tốn nhân lực, chậm trễ, dễ làm mất khách hàng.
 
-- **Lý do chọn đề tài:** Sự bùng nổ của thương mại điện tử đòi hỏi các cửa hàng phải chuyển đổi số và nâng cao chất lượng dịch vụ chăm sóc khách hàng trực tuyến 24/7.
-- **Bối cảnh thực tế / Vấn đề tồn tại:** Người mua có nhiều thắc mắc trước khi mua (kích cỡ, chính sách, v.v.). Việc tư vấn thủ công tốn thời gian, chi phí và không đáp ứng kịp khi lưu lượng truy cập lớn.
-- **Mục tiêu chính:** Tích hợp Chatbot tư vấn thông minh (dựa trên FAQ) vào website bán hàng để tự động giải đáp thắc mắc, tăng tương tác và nâng cao trải nghiệm mua sắm.
+**Lý do chọn đề tài:**
+- Website bán hàng truyền thống thiếu tính tương tác trực tiếp.
+- Cần một giải pháp tự động hóa khâu CSKH để tối ưu vận hành.
+
+**Mục tiêu chính:** 
+- Xây dựng hệ thống E-Commerce hoàn chỉnh kết hợp sức mạnh của AI Chatbot nhằm nâng cao trải nghiệm mua sắm và tự động hóa tư vấn.
 
 ---
 
-## Slide 3 – Mục tiêu & phạm vi
-
-**Mục tiêu & Phạm vi nghiên cứu**
+## 3. Slide 3 – Mục tiêu & phạm vi
+*Định hình rõ ràng ranh giới của đồ án để hội đồng không hỏi lan man ngoài phạm vi*
 
 **Mục tiêu cụ thể:**
-- Xây dựng thành công Website TMĐT với đầy đủ chức năng quản trị và mua hàng.
-- Tích hợp Chatbot tự động trả lời và gợi ý sản phẩm dựa trên tập câu hỏi cho trước.
+- Xây dựng Website mua sắm chuẩn UI/UX cho đa thiết bị.
+- Phát triển công cụ quản trị (Admin Dashboard) toàn diện.
+- Tích hợp Chatbot AI (Gemini) dựa trên hệ cơ sở tri thức (FAQ) nội bộ.
 
 **Phạm vi:**
-- **Làm gì:** Quản lý sản phẩm, giỏ hàng, đặt hàng, quản trị FAQ cho Chatbot, thống kê doanh thu.
-- **Không làm gì:** Không sử dụng các mô hình AI sinh ngôn ngữ tự nhiên (LLM) phức tạp; Không tích hợp thanh toán ngân hàng thật (chỉ dùng sandbox/mô phỏng).
+- **Làm gì:** Xây dựng luồng mua hàng (Xem -> Giỏ hàng -> Đặt hàng), Quản trị sản phẩm/đơn hàng/doanh thu, Chatbot tra cứu FAQ & Gợi ý sản phẩm.
+- **Không làm gì:** Chưa tích hợp với các hệ thống giao hàng thực tế (GHTK, Viettel Post). Tính năng thanh toán trực tuyến (VNPay/Momo) mới ở mức mô phỏng (Sandbox).
 
 ---
 
-## Slide 4 – Cơ sở lý thuyết / công nghệ
+## 4. Slide 4 – Cơ sở lý thuyết / công nghệ
+*Trình bày các công nghệ hiện đại đang sử dụng bằng Icon/Logo cho đẹp mắt*
 
-**Cơ sở lý thuyết & Công nghệ sử dụng**
+**Công nghệ sử dụng:**
+- **Frontend:** Next.js, React, TailwindCSS (Tối ưu SEO và hiệu năng hiển thị SSR/CSR).
+- **Backend:** NestJS (TypeScript), RESTful API, JWT (Kiến trúc chặt chẽ, bảo mật cao).
+- **Cơ sở dữ liệu:** PostgreSQL kết hợp Prisma ORM (Quản lý dữ liệu quan hệ mạnh mẽ).
+- **Trí tuệ nhân tạo:** API Google Gemini (Xử lý ngôn ngữ tự nhiên cho Chatbot).
+- **Triển khai:** Docker & Docker Compose (Đóng gói và triển khai đồng nhất).
 
-- **Kiến trúc hệ thống:** Mô hình 3 lớp (Client - Server - Database) kết hợp kiến trúc MVC (Model - View - Controller).
-- **Công nghệ Frontend:** 
-  - Next.js (React Framework), TypeScript
-  - TailwindCSS, shadcn/ui
-- **Công nghệ Backend:** 
-  - NestJS, RESTful API
-- **Cơ sở dữ liệu & Triển khai:** 
-  - PostgreSQL, Prisma ORM
-  - Docker & Docker Compose (Container hóa)
-- **Thuật toán Chatbot (Retrieval-based):** Đối sánh câu hỏi người dùng với tập FAQ (Câu hỏi thường gặp) bằng TF-IDF cosine similarity / từ khóa.
+**Mô hình kiến trúc:**
+- Sử dụng mô hình Client-Server. Backend tuân thủ kiến trúc MVC (Model - View - Controller).
 
 ---
 
-## Slide 5 – Phân tích hệ thống
+## 5. Slide 5 – Phân tích hệ thống
+*Thể hiện cái nhìn tổng quan về chức năng qua góc nhìn của người dùng*
 
-**Phân tích hệ thống**
+**Tác nhân (Actor):**
+1. **Khách hàng (Customer):** Mua sắm, tra cứu đơn hàng, tương tác Chatbot.
+2. **Quản trị viên (Admin):** Quản lý sản phẩm, đơn hàng, thống kê, nạp dữ liệu (FAQ) cho Chatbot.
+3. **Chatbot (Hệ thống):** Tự động trả lời, phân tích ý định, gợi ý mua hàng.
 
-- **Các Actor (Người dùng) chính:**
-  - **Khách hàng (Customer):** Mua sắm, đánh giá, tương tác Chatbot.
-  - **Quản trị viên (Admin):** Quản lý sản phẩm, đơn hàng, quản lý dữ liệu Chatbot (FAQ), thống kê.
-  - **Chatbot System:** Tự động đối sánh và trả lời tin nhắn.
+**Use case chính:** 
+- Luồng khách hàng: Đặt hàng, Áp dụng khuyến mãi, Hỏi đáp AI.
+- Luồng Admin: Quản lý trạng thái đơn, Quản lý kho, Dashboard thống kê.
 
-- **Use case chính:**
-  - *Quản lý bán hàng:* Đặt hàng, Áp mã khuyến mãi, Cập nhật trạng thái đơn.
-  - *Chatbot:* Thêm/Sửa/Xóa câu hỏi FAQ, Gợi ý sản phẩm liên quan.
-
-*(Gợi ý: Chèn ảnh Sơ đồ Use Case tổng quát từ file báo cáo vào đây - Hình trang 29 hoặc 30)*
-
----
-
-## Slide 6 – Thiết kế hệ thống
-
-**Thiết kế kiến trúc tổng thể**
-
-- **Luồng hoạt động (Client-Server):**
-  1. Trình duyệt (Client) gửi yêu cầu HTTP/HTTPS.
-  2. Nginx (Reverse Proxy) điều hướng yêu cầu.
-  3. Backend (NestJS) xử lý logic nghiệp vụ và truy vấn CSDL.
-  4. Database (PostgreSQL) trả về dữ liệu.
-- **Cơ sở dữ liệu:** Gồm 15 bảng (Bảng cốt lõi: `users`, `products`, `orders`, `faq`, `chatbot_log`).
-
-*(Gợi ý: Chèn ảnh Biểu đồ Triển Khai (Deployment Diagram) trang 66 hoặc Sơ đồ ERD trang 73 vào đây)*
+*(📸 **Ảnh cần chụp:** Bạn hãy chèn `Sơ đồ Use Case tổng quát toàn hệ thống` ở Trang 31 vào slide này để hội đồng nhìn rõ)*
 
 ---
 
-## Slide 7 – Demo chức năng chính (Khách hàng)
+## 6. Slide 6 – Thiết kế hệ thống
+*Trình bày về mặt kỹ thuật và kiến trúc*
 
-**Demo Chức năng Khách Hàng (Customer)**
+**Kiến trúc tổng thể:**
+- Kiến trúc 3 lớp (Three-tier): Presentation Layer (Next.js) ↔ Application Layer (NestJS) ↔ Data Layer (PostgreSQL).
 
-- Giao diện thiết kế theo phong cách hiện đại, trực quan (UI/UX).
-- Tính năng: Xem danh sách sản phẩm, lọc theo danh mục, xem chi tiết và đánh giá sản phẩm.
+**Cơ sở dữ liệu:**
+- Được chuẩn hóa để lưu trữ từ Dữ liệu bán hàng (Product, Order, Category) đến Dữ liệu đào tạo AI (FAQ, Chatbot_Log).
 
-*(Gợi ý: Chèn 1-2 ảnh chụp màn hình Trang chủ và Trang Danh mục sản phẩm - Hình trang 67, 68)*
-
----
-
-## Slide 8 – Demo chức năng chính (Đặt hàng & Quản trị)
-
-**Demo Chức năng Đặt hàng & Quản trị (Admin)**
-
-- **Khách hàng:** Quy trình Checkout (Thanh toán) mượt mà, quản lý giỏ hàng.
-- **Admin:** Dashboard thống kê doanh thu, trạng thái đơn hàng trực quan. Quản lý toàn diện hệ thống.
-
-*(Gợi ý: Chèn ảnh màn hình Giỏ hàng/Thanh toán và ảnh Dashboard Admin - Hình trang 70, 72)*
+*(📸 **Ảnh cần chụp:**)*
+1. Chụp `Biểu đồ triển khai (Deployment Diagram)` ở trang 68.
+2. Chụp `Sơ đồ ERD tổng quát` ở Trang 75 (Thu nhỏ vừa vặn).
 
 ---
 
-## Slide 9 – Demo chức năng chính (Chatbot Tư vấn)
+## 7. Slide 7 – Demo: Trải nghiệm mua sắm trực tuyến
+*Bắt đầu phần Demo - Giới thiệu tính năng của Khách hàng*
 
-**Demo Tính năng Chatbot Tự động**
+- Giao diện thân thiện, hiện đại, hỗ trợ bộ lọc và tìm kiếm nhanh.
+- Luồng mua hàng liền mạch từ Chi tiết sản phẩm -> Giỏ hàng -> Checkout.
 
-- Chatbot Widget tích hợp nổi trên mọi trang.
-- Tự động nhận diện câu hỏi và đưa ra câu trả lời dựa trên kho FAQ của Admin.
-- Tích hợp gợi ý trực tiếp thẻ sản phẩm (Product Card) ngay trong khung chat để khách hàng nhấn mua ngay.
-
-*(Gợi ý: Chèn ảnh màn hình giao diện Chatbot đang tư vấn sản phẩm - Hình trang 71 hoặc 97)*
-
----
-
-## Slide 10 – Kết quả đạt được
-
-**Kết quả đạt được & Đánh giá hiệu quả**
-
-- **Những gì đã làm được:** Hoàn thiện 100% các chức năng cốt lõi của một trang TMĐT thực tế. Hệ thống vận hành ổn định, tốc độ phản hồi nhanh.
-- **So sánh trước - sau:** 
-  - *Trước:* Người mua phải tự tìm đọc chính sách, chờ đợi nhân viên trực page trả lời tin nhắn.
-  - *Sau:* Chatbot trả lời tức thì (dưới 2 giây) 24/7, tỷ lệ chốt đơn nhanh hơn nhờ có link sản phẩm gợi ý.
-- **Kiểm thử (Testing):** Vượt qua bài Test tải (Load Testing) với 500 người dùng đồng thời, hệ thống bảo mật an toàn trước các cuộc tấn công spam (Rate Limiting).
+*(📸 **Ảnh cần chụp:**)*
+1. Chụp ảnh **Trang chủ (Trang 94)** thật đẹp.
+2. Chụp ảnh **Trang Đặt hàng & Thanh toán (Trang 98)** hiển thị rõ phần áp mã giảm giá.
 
 ---
 
-## Slide 11 – Hạn chế
+## 8. Slide 8 – Demo: Tính năng nổi bật - AI Chatbot
+*Phần ăn điểm nhất của đồ án, cần tập trung nhấn mạnh*
 
-**Hạn chế & Khó khăn gặp phải**
+- Hoạt động 24/7 như một nhân viên Sale thực thụ.
+- Hiểu ngôn ngữ tự nhiên thông qua API Gemini.
+- Trả lời chính xác về chính sách cửa hàng (nhờ nạp bộ FAQ).
+- Trực tiếp hiển thị thẻ sản phẩm (Product Card) ngay trong cửa sổ chat để khách bấm vào mua luôn.
 
-- **Những điểm chưa làm được:**
-  - Mô hình Chatbot hiện tại chỉ dựa trên từ khóa (Rule-based/FAQ-based), chưa có khả năng "hiểu sâu" ngôn ngữ tự nhiên phức tạp như các AI lớn hiện nay.
-  - Chức năng thanh toán trực tuyến mới dừng ở mức mô phỏng (Sandbox).
-- **Khó khăn gặp phải:** 
-  - Việc chuẩn bị một bộ dữ liệu FAQ (Hỏi-Đáp) đủ lớn và bao quát toàn bộ ngữ cảnh mua hàng tốn rất nhiều thời gian.
-  - Tối ưu hóa hiệu năng render phía Frontend (Next.js) để tránh lỗi Hydration.
-
----
-
-## Slide 12 – Hướng phát triển
-
-**Hướng phát triển trong tương lai**
-
-- **Nâng cấp công nghệ Chatbot:** Tích hợp các mô hình AI/LLM (như ChatGPT API, Gemini) kết hợp RAG (Retrieval-Augmented Generation) để chatbot giao tiếp tự nhiên và thông minh hơn.
-- **Hoàn thiện tính năng bán hàng:** Tích hợp trực tiếp API thanh toán thật (VNPay, MoMo, ZaloPay). Thêm các chiến dịch Flash Sale nâng cao, Quản lý kho hàng chuyên sâu.
-- **Ứng dụng thực tế:** Đóng gói hệ thống thành một giải pháp SaaS (Software as a Service) có thể bán lại hoặc áp dụng ngay cho các chuỗi cửa hàng bán lẻ quy mô vừa và nhỏ.
+*(📸 **Ảnh cần chụp:**)*
+1. Chụp ảnh **Giao diện Chatbot đang hoạt động (Trang 100 hoặc Trang 73)**. Nên chụp lúc Chatbot vừa gợi ý xong 1 sản phẩm có kèm hình ảnh.
 
 ---
 
-## Slide Cuối
+## 9. Slide 9 – Demo: Hệ thống Quản trị (Admin)
+*Giới thiệu tính năng dành cho chủ cửa hàng*
 
-**KẾT LUẬN & CẢM ƠN**
+- Bảng điều khiển (Dashboard) trực quan, theo dõi doanh thu theo thời gian thực.
+- Thống kê tỷ lệ đơn hàng (Biểu đồ).
+- Quản trị bộ dữ liệu FAQ để "dạy" Chatbot dễ dàng trên giao diện UI.
 
-- **Kết luận:** Đề tài đã giải quyết tốt bài toán ứng dụng công nghệ để tự động hóa quy trình chăm sóc khách hàng trong TMĐT. Quá trình làm đồ án giúp củng cố vững chắc kiến thức chuyên ngành.
-- **Cảm ơn:** Em xin gửi lời cảm ơn chân thành đến ThS. Lưu Thị Thảo cùng các thầy cô Khoa CNTT đã tận tình hướng dẫn em hoàn thành đồ án này!
+*(📸 **Ảnh cần chụp:**)*
+1. Chụp ảnh **Giao diện Dashboard Tổng quan (Trang 99 hoặc 74)** có đầy đủ biểu đồ doanh thu.
+2. (Tùy chọn) Chụp ảnh **Giao diện quản lý FAQ** (Từ màn hình ứng dụng thực tế).
 
-*Xin trân trọng cảm ơn Hội đồng đã lắng nghe!*
+---
+
+## 10. Slide 10 – Kết quả đạt được
+*Khẳng định sự thành công của đồ án bằng số liệu thực tế*
+
+**Những gì đã làm được:**
+- Xây dựng thành công Website hoàn chỉnh đáp ứng đầy đủ yêu cầu nghiệp vụ E-Commerce.
+- Chatbot AI hoạt động trơn tru, lấy đúng thông tin từ Database để phản hồi.
+- Tự động hóa kiểm thử (Automation Test) thành công 100% (11/11 Test Cases).
+
+**Đánh giá hiệu quả (Hiệu năng):**
+- Thông lượng (Throughput) đạt **>360 requests/s**. Thời gian phản hồi siêu tốc **~53ms**.
+- Hệ thống phòng thủ bảo mật tốt (Rate Limiting) chặn đứng 100% các request spam.
+
+*(📸 **Ảnh cần chụp:** Bạn mở Terminal chạy lệnh `node run-load-test.js` vừa nãy và chụp lại **Bảng thống kê màu xanh/đỏ** đẹp mắt để cho hội đồng thấy bằng chứng hệ thống chạy cực nhanh)*
+
+---
+
+## 11. Slide 11 – Hạn chế
+*Nêu ra một cách trung thực để thấy sự nhìn nhận khách quan*
+
+- **Công nghệ AI:** Chatbot vẫn phụ thuộc vào API của bên thứ 3 (Google Gemini) nên cần kết nối mạng ổn định, thỉnh thoảng có độ trễ của API.
+- **Thanh toán:** Cổng thanh toán trực tuyến mới chỉ dừng ở mức môi trường thử nghiệm (Sandbox), chưa cấu hình tài khoản doanh nghiệp thực.
+- **Nghiệp vụ:** Chưa có hệ thống quản lý Kho (Inventory) và Vận chuyển đa kho phức tạp.
+
+---
+
+## 12. Slide 12 – Hướng phát triển
+*Định hướng tương lai nếu phát triển tiếp*
+
+**Nâng cấp trong tương lai:**
+- Áp dụng các mô hình RAG (Retrieval-Augmented Generation) tiên tiến kết hợp Vector Database để Chatbot thông minh và hiểu ngữ cảnh sâu hơn.
+- Kết nối API của các đơn vị giao hàng (GHTK, Viettel Post) để tính phí ship theo khoảng cách thực tế.
+- Bổ sung hệ thống gửi Email/SMS Marketing tự động.
+
+**Ứng dụng thực tế:**
+- Đồ án sẵn sàng để đóng gói và cung cấp cho các shop bán hàng online quy mô vừa và nhỏ.
+
+---
+
+## 13. Slide cuối – Kết luận & Cảm ơn
+
+- **Kết luận:** Đồ án đã giải quyết tốt bài toán thương mại điện tử hiện đại, chứng minh hiệu quả của việc kết hợp AI vào quản lý kinh doanh.
+- **Cảm ơn:** Xin chân thành cảm ơn cô **Lưu Thị Thảo** và các thầy cô trong Hội đồng đã lắng nghe và góp ý!
+- *Mời quý thầy cô đặt câu hỏi!*

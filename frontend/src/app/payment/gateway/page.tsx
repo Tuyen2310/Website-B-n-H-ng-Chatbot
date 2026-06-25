@@ -119,7 +119,7 @@ function PaymentGatewayInner() {
               className="w-full h-14 rounded-2xl text-lg font-black uppercase tracking-widest bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/20 flex items-center gap-2"
               onClick={async () => {
                 try {
-                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/payment/webhook`, {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://smartshop.local:3000/api'}/payment/webhook`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ paymentId, status: 'SUCCESS' })

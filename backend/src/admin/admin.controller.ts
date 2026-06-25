@@ -28,4 +28,10 @@ export class AdminController {
   async getChatbotLogs() {
     return this.adminService.getChatbotLogs();
   }
+
+  @Get('chatbot-stats')
+  @ApiOperation({ summary: 'Get chatbot statistics' })
+  async getChatbotStats() {
+    return this.adminService.getChatbotStats();
+  }
 }

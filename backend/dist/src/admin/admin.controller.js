@@ -31,6 +31,9 @@ let AdminController = class AdminController {
     async getChatbotLogs() {
         return this.adminService.getChatbotLogs();
     }
+    async getChatbotStats() {
+        return this.adminService.getChatbotStats();
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -50,6 +53,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "getChatbotLogs", null);
+__decorate([
+    (0, common_1.Get)('chatbot-stats'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get chatbot statistics' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getChatbotStats", null);
 exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('admin'),
     (0, common_1.Controller)('admin'),

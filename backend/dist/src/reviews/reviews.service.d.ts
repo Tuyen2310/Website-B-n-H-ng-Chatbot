@@ -7,8 +7,8 @@ export declare class ReviewsService {
             name: string;
         };
     } & {
-        createdAt: Date;
         id: number;
+        createdAt: Date;
         productId: number;
         userId: number;
         rating: number;
@@ -21,8 +21,8 @@ export declare class ReviewsService {
             name: string;
         };
     } & {
-        createdAt: Date;
         id: number;
+        createdAt: Date;
         productId: number;
         userId: number;
         rating: number;
@@ -31,8 +31,8 @@ export declare class ReviewsService {
         repliedAt: Date | null;
     })[]>;
     reply(reviewId: number, reply: string): Promise<{
-        createdAt: Date;
         id: number;
+        createdAt: Date;
         productId: number;
         userId: number;
         rating: number;
@@ -41,8 +41,8 @@ export declare class ReviewsService {
         repliedAt: Date | null;
     }>;
     remove(id: number): Promise<{
-        createdAt: Date;
         id: number;
+        createdAt: Date;
         productId: number;
         userId: number;
         rating: number;

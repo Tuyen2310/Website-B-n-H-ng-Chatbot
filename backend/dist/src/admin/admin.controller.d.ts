@@ -13,14 +13,14 @@ export declare class AdminController {
         }[];
         lowStockCount: number;
         lowStockProducts: {
-            name: string;
             id: number;
-            category: {
-                name: string;
-            };
+            name: string;
             price: number;
             images: string[];
             stock: number;
+            category: {
+                name: string;
+            };
         }[];
         recentOrders: {
             id: number;
@@ -31,10 +31,16 @@ export declare class AdminController {
         }[];
     }>;
     getChatbotLogs(): Promise<{
-        createdAt: Date;
         id: number;
+        createdAt: Date;
         question: string;
         answer: string;
         userId: number | null;
     }[]>;
+    getChatbotStats(): Promise<{
+        totalFaqs: number;
+        totalLogs: number;
+        interactionsToday: number;
+        correctResponseRate: number;
+    }>;
 }

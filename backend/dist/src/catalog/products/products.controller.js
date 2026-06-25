@@ -94,6 +94,9 @@ let ProductsController = class ProductsController {
         }
         return this.productsService.importFromExcel(file.buffer);
     }
+    bulkRemove(ids) {
+        return this.productsService.bulkRemove(ids);
+    }
     findOne(id) {
         return this.productsService.findOne(id);
     }
@@ -175,6 +178,18 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "importExcel", null);
+__decorate([
+    (0, common_1.Post)('bulk-delete'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete multiple products (Admin only)' }),
+    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'number' } } } } }),
+    __param(0, (0, common_1.Body)('ids')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Array]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "bulkRemove", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Get product by ID' }),

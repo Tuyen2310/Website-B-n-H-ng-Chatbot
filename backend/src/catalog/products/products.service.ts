@@ -119,6 +119,13 @@ export class ProductsService {
     });
   }
 
+  async bulkRemove(ids: number[]) {
+    return this.prisma.product.updateMany({
+      where: { id: { in: ids } },
+      data: { isDeleted: true },
+    });
+  }
+
   /**
    * Trả về template Excel mẫu dưới dạng Buffer để tải xuống
    */

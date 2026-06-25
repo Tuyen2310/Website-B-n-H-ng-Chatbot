@@ -13,6 +13,8 @@ export class FaqsService {
   async findAll() {
     return this.prisma.fAQ.findMany({
       where: { isDeleted: false },
+      include: { product: true },
+      orderBy: { createdAt: 'desc' }
     });
   }
 

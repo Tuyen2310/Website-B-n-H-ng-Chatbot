@@ -8,21 +8,21 @@ export declare class OrdersQuickController {
     createGuestOrder(createOrderDto: CreateOrderDto): Promise<{
         items: ({
             product: {
-                isDeleted: boolean;
-                name: string;
-                description: string;
-                createdAt: Date;
-                updatedAt: Date;
                 id: number;
+                name: string;
                 price: number;
+                description: string;
                 images: string[];
                 videoUrl: string | null;
                 stock: number;
                 soldCount: number;
+                categoryId: number;
                 attributes: import("@prisma/client/runtime/library").JsonValue | null;
                 isFlashSale: boolean;
                 flashSalePrice: number | null;
-                categoryId: number;
+                isDeleted: boolean;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
             id: number;
@@ -33,9 +33,9 @@ export declare class OrdersQuickController {
             variantId: number | null;
         })[];
     } & {
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number;
         status: import(".prisma/client").$Enums.OrderStatus;
         paymentId: string | null;

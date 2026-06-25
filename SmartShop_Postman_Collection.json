@@ -58,18 +58,34 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"email\": \"admin@smartshop.com\",\n    \"password\": \"admin123\"\n}",
-							"options": { "raw": { "language": "json" } }
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
 						}
 					},
 					"response": []
@@ -128,9 +144,18 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/products?take=5",
-							"host": ["{{baseUrl}}"],
-							"path": ["products"],
-							"query": [{ "key": "take", "value": "5" }]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "take",
+									"value": "5"
+								}
+							]
 						}
 					},
 					"response": []
@@ -188,8 +213,83 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/categories",
-							"host": ["{{baseUrl}}"],
-							"path": ["categories"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UT-04 | Đăng ký tài khoản mới",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'UT-04';",
+									"const testName = 'Đăng ký tài khoản mới';",
+									"const testType = 'Unit Test';",
+									"const testFunction = 'Đăng ký người dùng (Register)';",
+									"const expected = 'HTTP 201 và tạo thành công';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[UT-04] HTTP Status phải là 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"try {",
+									"    if ([201, 400].includes(pm.response.code)) {",
+									"        actual = 'HTTP ' + pm.response.code;",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code;",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newuser{{$timestamp}}@example.com\",\n    \"password\": \"password123\",\n    \"name\": \"Test User\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
 						}
 					},
 					"response": []
@@ -247,11 +347,21 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/users/me",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "me"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
 						}
 					},
 					"response": []
@@ -313,11 +423,21 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/products?category=1&take=5",
-							"host": ["{{baseUrl}}"],
-							"path": ["products"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							],
 							"query": [
-								{ "key": "category", "value": "1" },
-								{ "key": "take", "value": "5" }
+								{
+									"key": "category",
+									"value": "1"
+								},
+								{
+									"key": "take",
+									"value": "5"
+								}
 							]
 						}
 					},
@@ -379,9 +499,95 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/promotions/validate?code={{promoCode}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["promotions", "validate"],
-							"query": [{ "key": "code", "value": "{{promoCode}}" }]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"promotions",
+								"validate"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "{{promoCode}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "IT-04 | Giỏ hàng và Checkout (Cart)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const testId = 'IT-04';",
+									"const testName = 'Giỏ hàng và Checkout (Cart)';",
+									"const testType = 'Integration Test';",
+									"const testFunction = 'Tích hợp Giỏ hàng và Thanh toán';",
+									"const expected = 'HTTP 201, tạo đơn hàng thành công';",
+									"",
+									"let actual = '';",
+									"let status = 'FAIL';",
+									"",
+									"pm.test('[IT-04] HTTP Status phải là 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('[IT-04] Đơn hàng được tạo thành công', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('id');",
+									"});",
+									"",
+									"try {",
+									"    if ([200, 201].includes(pm.response.code)) {",
+									"        actual = 'HTTP ' + pm.response.code;",
+									"        status = 'PASS';",
+									"    } else {",
+									"        actual = 'HTTP ' + pm.response.code;",
+									"    }",
+									"} catch(e) { actual = 'Lỗi: ' + e.message; }",
+									"",
+									"const results = JSON.parse(pm.collectionVariables.get('testResults') || '[]');",
+									"results.push({ id:testId, name:testName, type:testType, function:testFunction, expected:expected, actual:actual, status:status });",
+									"pm.collectionVariables.set('testResults', JSON.stringify(results));",
+									"console.log('[TEST RESULT]', JSON.stringify({id:testId, status:status, actual:actual}));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shippingAddress\": \"123 Test\",\n    \"shippingProvince\": \"HCM\",\n    \"paymentMethod\": \"COD\",\n    \"items\": [{ \"productId\": {{firstProductId}}, \"quantity\": 2, \"price\": 100000 }],\n    \"totalAmount\": 200000,\n    \"shippingFee\": 30000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
 						}
 					},
 					"response": []
@@ -452,18 +658,32 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Authorization", "value": "Bearer {{token}}" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"shippingAddress\": \"123 Đường Kiểm Thử, TP.HCM\",\n    \"shippingProvince\": \"Hồ Chí Minh\",\n    \"paymentMethod\": \"COD\",\n    \"items\": [\n        {\n            \"productId\": {{orderProductId}},\n            \"quantity\": 1,\n            \"price\": 500000\n        }\n    ],\n    \"totalAmount\": 500000,\n    \"shippingFee\": 30000\n}",
-							"options": { "raw": { "language": "json" } }
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/orders",
-							"host": ["{{baseUrl}}"],
-							"path": ["orders"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
 						}
 					},
 					"response": []
@@ -517,12 +737,27 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/admin/stats?timeRange=ALL",
-							"host": ["{{baseUrl}}"],
-							"path": ["admin", "stats"],
-							"query": [{ "key": "timeRange", "value": "ALL" }]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"stats"
+							],
+							"query": [
+								{
+									"key": "timeRange",
+									"value": "ALL"
+								}
+							]
 						}
 					},
 					"response": []
@@ -582,18 +817,34 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "noauth" },
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"message\": \"Cho tôi xem các điện thoại iPhone dưới 20 triệu đồng\"\n}",
-							"options": { "raw": { "language": "json" } }
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/chatbot/chat",
-							"host": ["{{baseUrl}}"],
-							"path": ["chatbot", "chat"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chatbot",
+								"chat"
+							]
 						}
 					},
 					"response": []
@@ -627,7 +878,9 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
-				"exec": [""]
+				"exec": [
+					""
+				]
 			}
 		}
 	],

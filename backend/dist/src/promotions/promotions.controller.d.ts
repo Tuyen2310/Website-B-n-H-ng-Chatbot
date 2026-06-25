@@ -4,9 +4,9 @@ export declare class PromotionsController {
     private readonly promotionsService;
     constructor(promotionsService: PromotionsService);
     create(data: Prisma.PromotionCreateInput): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number | null;
         discountPercent: number | null;
         type: import(".prisma/client").$Enums.PromotionType;
@@ -19,9 +19,9 @@ export declare class PromotionsController {
     }>;
     findAll(skip?: string, take?: string): Promise<{
         items: {
+            id: number;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
             discountAmount: number | null;
             discountPercent: number | null;
             type: import(".prisma/client").$Enums.PromotionType;
@@ -35,9 +35,9 @@ export declare class PromotionsController {
         total: number;
     }>;
     validate(code: string): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number | null;
         discountPercent: number | null;
         type: import(".prisma/client").$Enums.PromotionType;
@@ -49,9 +49,9 @@ export declare class PromotionsController {
         isActive: boolean;
     } | null>;
     findOne(id: number): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number | null;
         discountPercent: number | null;
         type: import(".prisma/client").$Enums.PromotionType;
@@ -63,9 +63,9 @@ export declare class PromotionsController {
         isActive: boolean;
     }>;
     update(id: number, data: Prisma.PromotionUpdateInput): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number | null;
         discountPercent: number | null;
         type: import(".prisma/client").$Enums.PromotionType;
@@ -77,9 +77,9 @@ export declare class PromotionsController {
         isActive: boolean;
     }>;
     remove(id: number): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number | null;
         discountPercent: number | null;
         type: import(".prisma/client").$Enums.PromotionType;

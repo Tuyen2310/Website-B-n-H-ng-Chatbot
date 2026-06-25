@@ -7,21 +7,21 @@ export declare class OrdersController {
     create(req: any, createOrderDto: CreateOrderDto): Promise<{
         items: ({
             product: {
-                isDeleted: boolean;
-                name: string;
-                description: string;
-                createdAt: Date;
-                updatedAt: Date;
                 id: number;
+                name: string;
                 price: number;
+                description: string;
                 images: string[];
                 videoUrl: string | null;
                 stock: number;
                 soldCount: number;
+                categoryId: number;
                 attributes: import("@prisma/client/runtime/library").JsonValue | null;
                 isFlashSale: boolean;
                 flashSalePrice: number | null;
-                categoryId: number;
+                isDeleted: boolean;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
             id: number;
@@ -32,9 +32,9 @@ export declare class OrdersController {
             variantId: number | null;
         })[];
     } & {
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number;
         status: import(".prisma/client").$Enums.OrderStatus;
         paymentId: string | null;
@@ -59,21 +59,21 @@ export declare class OrdersController {
             } | null;
             items: ({
                 product: {
-                    isDeleted: boolean;
-                    name: string;
-                    description: string;
-                    createdAt: Date;
-                    updatedAt: Date;
                     id: number;
+                    name: string;
                     price: number;
+                    description: string;
                     images: string[];
                     videoUrl: string | null;
                     stock: number;
                     soldCount: number;
+                    categoryId: number;
                     attributes: import("@prisma/client/runtime/library").JsonValue | null;
                     isFlashSale: boolean;
                     flashSalePrice: number | null;
-                    categoryId: number;
+                    isDeleted: boolean;
+                    createdAt: Date;
+                    updatedAt: Date;
                 };
             } & {
                 id: number;
@@ -84,9 +84,9 @@ export declare class OrdersController {
                 variantId: number | null;
             })[];
         } & {
+            id: number;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
             discountAmount: number;
             status: import(".prisma/client").$Enums.OrderStatus;
             paymentId: string | null;
@@ -113,21 +113,21 @@ export declare class OrdersController {
         } | null;
         items: ({
             product: {
-                isDeleted: boolean;
-                name: string;
-                description: string;
-                createdAt: Date;
-                updatedAt: Date;
                 id: number;
+                name: string;
                 price: number;
+                description: string;
                 images: string[];
                 videoUrl: string | null;
                 stock: number;
                 soldCount: number;
+                categoryId: number;
                 attributes: import("@prisma/client/runtime/library").JsonValue | null;
                 isFlashSale: boolean;
                 flashSalePrice: number | null;
-                categoryId: number;
+                isDeleted: boolean;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
             id: number;
@@ -138,9 +138,9 @@ export declare class OrdersController {
             variantId: number | null;
         })[];
     } & {
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number;
         status: import(".prisma/client").$Enums.OrderStatus;
         paymentId: string | null;
@@ -157,9 +157,9 @@ export declare class OrdersController {
         pointsUsed: number | null;
     }>;
     updateStatus(id: number, status: OrderStatus): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number;
         status: import(".prisma/client").$Enums.OrderStatus;
         paymentId: string | null;
@@ -176,9 +176,9 @@ export declare class OrdersController {
         pointsUsed: number | null;
     }>;
     updatePaymentStatus(id: number, paymentStatus: boolean): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number;
         status: import(".prisma/client").$Enums.OrderStatus;
         paymentId: string | null;
@@ -195,9 +195,9 @@ export declare class OrdersController {
         pointsUsed: number | null;
     }>;
     cancelOrder(req: any, id: number): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number;
         status: import(".prisma/client").$Enums.OrderStatus;
         paymentId: string | null;
@@ -214,9 +214,9 @@ export declare class OrdersController {
         pointsUsed: number | null;
     }>;
     complete(req: any, id: number): Promise<{
+        id: number;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         discountAmount: number;
         status: import(".prisma/client").$Enums.OrderStatus;
         paymentId: string | null;

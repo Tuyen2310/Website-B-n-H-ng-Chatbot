@@ -21,14 +21,14 @@ export class ChatbotService implements OnModuleInit {
       return;
     }
     this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    this.logger.log('Gemini AI model initialized successfully (gemini-1.5-flash)');
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    this.logger.log('Gemini AI model initialized successfully (gemini-2.5-flash)');
   }
 
   async chat(message: string, userId?: number) {
     // 0. Resolve API Key Dynamically
     const settings = await this.prisma.settings.findFirst({ orderBy: { updatedAt: 'desc' } });
-    const apiKey = (settings as any)?.chatbotApiKey || this.configService.get<string>('GEMINI_API_KEY');
+    const apiKey = settings?.chatbotApiKey || this.configService.get<string>('GEMINI_API_KEY');
 
     if (!apiKey) {
       this.logger.error('No Gemini API Key found in Settings or .env');
@@ -41,21 +41,23 @@ export class ChatbotService implements OnModuleInit {
       try {
         this.genAI = new GoogleGenerativeAI(apiKey);
         
-        // Try latest models for 2026 in order of preference
-        const modelsToTry = [
-          'gemini-3.1-flash-lite',
-          'gemini-2.5-flash-lite',
-          'gemini-2.0-flash',
-          'gemini-1.5-flash',
-          'gemini-pro'
+        let preferredModel = (settings as any)?.chatbotModel || this.configService.get<string>('GEMINI_MODEL') || 'gemini-2.5-flash';
+        
+        // Try models in order of preference, starting with the configured one
+        const baseModels = [
+          'gemini-2.5-flash',
+          'gemini-flash-lite-latest',
+          'gemini-flash-latest',
+          'gemini-3.5-flash'
         ];
+        // Remove preferred from base to avoid duplicates, then prepend it
+        const modelsToTry = [preferredModel, ...baseModels.filter(m => m !== preferredModel)];
 
         let initialized = false;
         for (const modelName of modelsToTry) {
           try {
             const testModel = this.genAI.getGenerativeModel(
-              { model: modelName },
-              { apiVersion: 'v1' }
+              { model: modelName }
             );
             
             // Active verification: Small call to see if model exists for this key
@@ -94,7 +96,6 @@ export class ChatbotService implements OnModuleInit {
         this.prisma.fAQ.findMany({ where: { isDeleted: false } }),
         this.prisma.product.findMany({
           where: { isDeleted: false },
-          take: 30,
           include: { category: true },
         }),
       ]);
@@ -108,31 +109,36 @@ export class ChatbotService implements OnModuleInit {
       };
 
       // 2. Hybrid Logic: Priority matching for FAQs
+      let matchedFaqContext = '';
       const directMatch = faqs.find(f => {
         const q = f.question.toLowerCase().trim();
         return cleanMessage === q || cleanMessage.includes(q) || q.includes(cleanMessage);
       });
 
       if (directMatch && cleanMessage.length > 5) {
+        matchedFaqContext = `\n[CỰC KỲ QUAN TRỌNG] KHÁCH HÀNG VỪA HỎI CÂU HỎI FAQ. BẠN BẮT BUỘC PHẢI GIỮ NGUYÊN VĂN BẢN TRẢ LỜI CỦA CỬA HÀNG NHƯ SAU, KHÔNG ĐƯỢC THÊM BỚT TỪ NGỮ: "${directMatch.answer}". \nBên dưới câu trả lời đó, nếu có nhắc đến tên sản phẩm, bạn MỚI ĐƯỢC thêm khung hiển thị sản phẩm (ảnh, giá, link, nút thêm giỏ hàng) theo chuẩn của NGUYÊN TẮC PHỤC VỤ. Nếu không có sản phẩm nào liên quan thì chỉ trả lời y nguyên văn bản trên.`;
         await this.prisma.chatbotLog.create({
           data: { userId, question: message, answer: directMatch.answer },
         });
-        return { response: directMatch.answer };
       }
 
       // 3. Construct Context
       const productContext = products.map(p => {
-        const firstImg = p.images && p.images.length > 0 ? p.images[0] : 'https://placehold.co/400x400?text=No+Image';
         const attributes = (p as any).attributes;
         const attrStr = attributes ? JSON.stringify(attributes) : 'Không có thông số';
         // Giới hạn mô tả để không quá dài
         const shortDesc = p.description ? (p.description.length > 80 ? p.description.substring(0, 80) + '...' : p.description) : 'Đang cập nhật...';
+        let imgUrl = (p as any).images?.[0] || 'https://via.placeholder.com/300';
         
-        return `🛍️ **${p.name}**
-💸 Giá: *${p.price.toLocaleString('vi-VN')}đ*
-✨ ${shortDesc}
-![ảnh sản phẩm](${firstImg})
-[Xem chi tiết ngay](/shop/${p.id})`;
+        // Prevent massive base64 strings from crashing the AI token limit
+        if (imgUrl.startsWith('data:image')) {
+          imgUrl = 'https://via.placeholder.com/300?text=anh-san-pham';
+        }
+        
+        return `Mã Thẻ: [PRODUCT_CARD:${p.id}]
+Tên: ${p.name}
+Giá: ${p.price.toLocaleString('vi-VN')}đ
+Mô tả: ${shortDesc}`;
       }).join('\n\n');
 
       const faqContext = faqs.map(f => `Q: ${f.question} -> A: ${f.answer}`).join('\n');
@@ -147,8 +153,19 @@ export class ChatbotService implements OnModuleInit {
         });
         
         if (pastOrders.length > 0) {
-          userHistory = pastOrders.flatMap(o => o.items.map(i => i.product.name)).join(', ');
-          userHistory = `LỊCH SỬ MUA HÀNG GẦN ĐÂY CỦA KHÁCH: ${userHistory}. (Hãy dựa vào đây để gợi ý thêm sản phẩm phù hợp nếu khách nhờ tư vấn)`;
+          const orderDetails = pastOrders.map(o => {
+            const itemNames = o.items.map(i => i.product.name).join(', ');
+            let statusText = '';
+            switch(o.status) {
+              case 'PENDING': statusText = 'Đang chờ xử lý'; break;
+              case 'CONFIRMED': statusText = 'Đã xác nhận'; break;
+              case 'SHIPPING': statusText = 'Đang giao hàng'; break;
+              case 'COMPLETED': statusText = 'Đã hoàn thành'; break;
+              case 'CANCELLED': statusText = 'Đã hủy'; break;
+            }
+            return `Mã đơn #${o.id} (${statusText}) - Sản phẩm: ${itemNames}`;
+          }).join(' | ');
+          userHistory = `LỊCH SỬ ĐƠN HÀNG CỦA KHÁCH: ${orderDetails}. (Nếu khách hỏi trạng thái đơn hàng, hãy báo chính xác trạng thái này. Đồng thời dựa vào đây để gợi ý thêm sản phẩm phù hợp)`;
         }
       }
 
@@ -158,28 +175,26 @@ export class ChatbotService implements OnModuleInit {
       THÔNG TIN CỬA HÀNG:
       - Hotline: **${shopInfo.phone}** | Email: **${shopInfo.email}**
       - Địa chỉ: ${shopInfo.address}
-      - Chính sách: Miễn phí vận chuyển cho đơn từ 200k, Bảo hành 12 tháng, Đổi trả trong 30 ngày.
 
       ${userHistory}
+      ${matchedFaqContext}
 
       DANH SÁCH SẢN PHẨM HIỆN CÓ:
       ${productContext}
 
-      CÂU HỎI THƯỜNG GẶP:
+      CÂU HỎI THƯỜNG GẶP (FAQ):
       ${faqContext}
 
       NGUYÊN TẮC PHỤC VỤ:
       1. GIỌNG ĐIỆU: Chuyên nghiệp, nồng hậu. Gọi khách hàng là "Quý khách" hoặc "Anh/Chị".
-      2. TƯ VẤN SẢN PHẨM: Khi giới thiệu sản phẩm, LUÔN dùng CHÍNH XÁC cấu trúc sau (mỗi thông tin trên 1 dòng để dễ nhìn):
+      2. TƯ VẤN SẢN PHẨM: Khi giới thiệu sản phẩm, bạn BẮT BUỘC chỉ được xuất ra đúng 1 dòng mã Thẻ Sản Phẩm duy nhất (vd: [PRODUCT_CARD:15]). TUYỆT ĐỐI KHÔNG tự gõ lại tên sản phẩm, không tự vẽ thêm markdown, không tự ghi giá tiền hay link. Chỉ xuất ra thẻ [PRODUCT_CARD:id] và hệ thống sẽ tự động hiển thị thẻ UI siêu đẹp cho khách hàng.
       
-      🛍️ **[Tên sản phẩm]**
-      💸 Giá: *[Giá]*
-      ✨ [1 câu ngắn mô tả điểm nổi bật]
-      ![ảnh sản phẩm](url_ảnh)
-      [Xem chi tiết ngay](url_link)
+      Ví dụ một câu trả lời ĐÚNG:
+      "Dạ em gửi Quý khách mẫu điện thoại xịn nhất bên em ạ:
+      [PRODUCT_CARD:23]"
 
-      3. TRÌNH BÀY: Sử dụng Markdown sang trọng, dùng các biểu tượng emoji phù hợp. Xuống dòng rõ ràng giữa các ý. Dùng bullet points nếu cần liệt kê.
-      4. KHÔNG BIA ĐẶT: Chỉ tư vấn dựa trên danh sách sản phẩm và FAQ được cung cấp. Tuyệt đối lấy đúng link sản phẩm đã cho.`;
+      3. TRÌNH BÀY: Sử dụng Markdown sang trọng, dùng các biểu tượng emoji phù hợp. Dùng gạch đầu dòng rõ ràng.
+      4. KHÔNG BIA ĐẶT: Chỉ tư vấn dựa trên danh sách sản phẩm và FAQ được cung cấp.`;
 
       // 4. Generate Content with Fallback Support
       if (!this.model) {
@@ -205,7 +220,13 @@ export class ChatbotService implements OnModuleInit {
         data: { userId, question: message, answer: responseText },
       });
 
-      return { response: responseText };
+      // Suggest 3 random related FAQs
+      let suggestions: string[] = [];
+      const otherFaqs = faqs.filter(f => f.id !== directMatch?.id);
+      const shuffled = otherFaqs.sort(() => 0.5 - Math.random());
+      suggestions = shuffled.slice(0, 3).map(f => f.question);
+
+      return { response: responseText, suggestions };
     } catch (error: any) {
       this.logger.error('Chatbot error:', error.message);
       const phone = shopInfo?.phone || '0987654321';

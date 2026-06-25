@@ -8,10 +8,10 @@ export declare class AuthController {
         user: any;
     }>;
     register(registerDto: RegisterDto): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
         phone: string | null;
         address: string | null;

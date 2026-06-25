@@ -146,4 +146,77 @@ describe('Integration Tests (e2e) cho 5 chức năng', () => {
     expect(checkRes.status).toBe(200);
     expect(checkRes.body.isDeleted).toBe(true);
   });
+  // ==========================================
+  // TEST 6: Đăng ký tài khoản (Register)
+  // ==========================================
+  it('6. Register: Người dùng có thể đăng ký tài khoản mới', async () => {
+    const randomEmail = `test_user_${Date.now()}@example.com`;
+    const res = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({
+        email: randomEmail,
+        password: 'password123',
+        fullName: 'Test User'
+      });
+
+    // Check if created successfully
+    expect(res.status).toBe(201);
+    expect(res.body.user).toBeDefined();
+    expect(res.body.user.email).toBe(randomEmail);
+    expect(res.body.access_token).toBeDefined();
+  });
+
+  // ==========================================
+  // TEST 7: Giỏ hàng / Mua hàng số lượng lớn (Cart)
+  // ==========================================
+  it('7. Cart/Order: Checkout giỏ hàng với nhiều sản phẩm', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/orders')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({
+        items: [
+          { productId: createdProductId, quantity: 3 },
+          { productId: createdProductId, quantity: 2 }
+        ],
+        paymentMethod: 'VNPAY',
+        shippingAddress: '456 Test Blvd, HCM',
+        shippingProvince: 'Hồ Chí Minh'
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.status).toBe('PENDING');
+    // It should sum up properly
+    expect(res.body.items).toBeDefined();
+  });
+
+  // ==========================================
+  // TEST 8: Thống kê & Báo cáo (Reports)
+  // ==========================================
+  it('8. Reports: Admin có thể lấy dữ liệu thống kê Dashboard', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/reports/dashboard')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    // Assuming the reports endpoint returns an object with total revenue, etc.
+    expect(res.status).toBe(200);
+    expect(res.body.totalRevenue).toBeDefined();
+    expect(res.body.totalOrders).toBeDefined();
+    expect(res.body.totalUsers).toBeDefined();
+  });
+
+  // ==========================================
+  // TEST 9: Chatbot AI (Chatbot)
+  // ==========================================
+  it('9. Chatbot: Gửi tin nhắn và nhận phản hồi từ Chatbot', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/chatbot/chat')
+      .send({
+        userId: 'test_user_id',
+        message: 'Xin chào, bạn có bán điện thoại không?'
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.response).toBeDefined();
+    expect(typeof res.body.response).toBe('string');
+  });
 });

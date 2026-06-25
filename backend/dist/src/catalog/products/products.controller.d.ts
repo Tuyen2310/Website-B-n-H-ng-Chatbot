@@ -5,48 +5,48 @@ export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
     create(data: Prisma.ProductUncheckedCreateInput): Promise<{
-        isDeleted: boolean;
-        name: string;
-        description: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
+        name: string;
         price: number;
+        description: string;
         images: string[];
         videoUrl: string | null;
         stock: number;
         soldCount: number;
+        categoryId: number;
         attributes: Prisma.JsonValue | null;
         isFlashSale: boolean;
         flashSalePrice: number | null;
-        categoryId: number;
+        isDeleted: boolean;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     findAll(category?: string, search?: string, minPrice?: string, maxPrice?: string, sortBy?: string, sortOrder?: 'asc' | 'desc', skip?: string, take?: string, isFlashSale?: string): Promise<{
         items: ({
             category: {
-                isDeleted: boolean;
+                id: number;
                 name: string;
                 description: string | null;
+                isDeleted: boolean;
                 createdAt: Date;
                 updatedAt: Date;
-                id: number;
             };
         } & {
-            isDeleted: boolean;
-            name: string;
-            description: string;
-            createdAt: Date;
-            updatedAt: Date;
             id: number;
+            name: string;
             price: number;
+            description: string;
             images: string[];
             videoUrl: string | null;
             stock: number;
             soldCount: number;
+            categoryId: number;
             attributes: Prisma.JsonValue | null;
             isFlashSale: boolean;
             flashSalePrice: number | null;
-            categoryId: number;
+            isDeleted: boolean;
+            createdAt: Date;
+            updatedAt: Date;
         })[];
         total: number;
     }>;
@@ -62,25 +62,26 @@ export declare class ProductsController {
     } | {
         error: string;
     }>;
+    bulkRemove(ids: number[]): Promise<Prisma.BatchPayload>;
     findOne(id: number): Promise<({
         category: {
-            isDeleted: boolean;
+            id: number;
             name: string;
             description: string | null;
+            isDeleted: boolean;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
         };
         reviews: ({
             user: {
+                id: number;
                 name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                id: number;
                 email: string;
-                password: string | null;
                 phone: string | null;
                 address: string | null;
+                password: string | null;
                 role: import(".prisma/client").$Enums.Role;
                 isBlocked: boolean;
                 points: number;
@@ -91,8 +92,8 @@ export declare class ProductsController {
                 isVerified: boolean;
             };
         } & {
-            createdAt: Date;
             id: number;
+            createdAt: Date;
             productId: number;
             userId: number;
             rating: number;
@@ -101,67 +102,67 @@ export declare class ProductsController {
             repliedAt: Date | null;
         })[];
     } & {
-        isDeleted: boolean;
-        name: string;
-        description: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
+        name: string;
         price: number;
+        description: string;
         images: string[];
         videoUrl: string | null;
         stock: number;
         soldCount: number;
+        categoryId: number;
         attributes: Prisma.JsonValue | null;
         isFlashSale: boolean;
         flashSalePrice: number | null;
-        categoryId: number;
+        isDeleted: boolean;
+        createdAt: Date;
+        updatedAt: Date;
     }) | null>;
     getRecommendations(id: number): Promise<{
-        name: string;
         id: number;
-        category: {
-            name: string;
-            id: number;
-        };
+        name: string;
         price: number;
         images: string[];
         soldCount: number;
         isFlashSale: boolean;
         flashSalePrice: number | null;
+        category: {
+            id: number;
+            name: string;
+        };
     }[]>;
     update(id: number, data: Prisma.ProductUncheckedUpdateInput): Promise<{
-        isDeleted: boolean;
-        name: string;
-        description: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
+        name: string;
         price: number;
+        description: string;
         images: string[];
         videoUrl: string | null;
         stock: number;
         soldCount: number;
+        categoryId: number;
         attributes: Prisma.JsonValue | null;
         isFlashSale: boolean;
         flashSalePrice: number | null;
-        categoryId: number;
+        isDeleted: boolean;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     remove(id: number): Promise<{
-        isDeleted: boolean;
-        name: string;
-        description: string;
-        createdAt: Date;
-        updatedAt: Date;
         id: number;
+        name: string;
         price: number;
+        description: string;
         images: string[];
         videoUrl: string | null;
         stock: number;
         soldCount: number;
+        categoryId: number;
         attributes: Prisma.JsonValue | null;
         isFlashSale: boolean;
         flashSalePrice: number | null;
-        categoryId: number;
+        isDeleted: boolean;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
 }

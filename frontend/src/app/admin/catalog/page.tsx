@@ -28,6 +28,7 @@ import {
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useRef } from "react";
 import { toast } from "sonner"; 
 import { useRouter } from "next/navigation";
@@ -62,6 +63,18 @@ export default function AdminCatalogPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
+
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: (ids: number[]) => adminApi.bulkDeleteProducts(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      setSelectedIds([]);
+      toast.success("Đã xóa các sản phẩm được chọn.");
+    },
+    onError: () => toast.error("Có lỗi xảy ra khi xóa hàng loạt.")
+  });
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,7 +143,23 @@ export default function AdminCatalogPage() {
       (stockFilter === "LOW_STOCK" && p.stock > 0 && p.stock <= 10) ||
       (stockFilter === "OUT_OF_STOCK" && p.stock === 0);
     return matchesStock;
-  });
+  }) || [];
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(filteredProducts.map((p: any) => p.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelect = (id: number, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(item => item !== id));
+    }
+  };
 
   return (
     <div className="space-y-10">
@@ -174,6 +203,20 @@ export default function AdminCatalogPage() {
           >
             <Plus className="h-5 w-5" /> Thêm sản phẩm mới
           </Button>
+          {selectedIds.length > 0 && (
+            <Button 
+              variant="destructive"
+              className="gap-2 rounded-xl h-10 shadow-lg shadow-red-500/20"
+              onClick={() => {
+                if (confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} sản phẩm đã chọn?`)) {
+                  bulkDeleteMutation.mutate(selectedIds);
+                }
+              }}
+              disabled={bulkDeleteMutation.isPending}
+            >
+              <Trash2 className="h-4 w-4" /> Xóa ({selectedIds.length})
+            </Button>
+          )}
         </div>
       </div>
 
@@ -261,6 +304,12 @@ export default function AdminCatalogPage() {
           <Table>
             <TableHeader className="bg-gray-50/50">
               <TableRow className="border-none hover:bg-transparent">
+                <TableHead className="w-12 p-8 pr-0">
+                  <Checkbox 
+                    checked={filteredProducts.length > 0 && selectedIds.length === filteredProducts.length}
+                    onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                  />
+                </TableHead>
                 <TableHead className="w-24 p-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">ID</TableHead>
                 <TableHead className="p-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Thông tin sản phẩm</TableHead>
                 <TableHead className="p-8 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Danh mục</TableHead>
@@ -274,6 +323,7 @@ export default function AdminCatalogPage() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i} className="border-b border-gray-50">
+                    <TableCell className="p-8 pr-0"><Skeleton className="h-4 w-4 rounded-md" /></TableCell>
                     <TableCell className="p-8"><Skeleton className="h-4 w-10" /></TableCell>
                     <TableCell className="p-8"><Skeleton className="h-14 w-full rounded-xl" /></TableCell>
                     <TableCell className="p-8 text-center"><Skeleton className="h-4 w-20 mx-auto" /></TableCell>
@@ -290,6 +340,12 @@ export default function AdminCatalogPage() {
                     className="border-b border-gray-50 hover:bg-gray-50/80 transition-all cursor-pointer group"
                     onClick={() => router.push(`/admin/catalog/${product.id}`)}
                   >
+                    <TableCell className="p-8 pr-0" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox 
+                        checked={selectedIds.includes(product.id)}
+                        onCheckedChange={(checked) => handleSelect(product.id, checked as boolean)}
+                      />
+                    </TableCell>
                     <TableCell className="p-8 font-black text-gray-400 text-sm">#{product.id}</TableCell>
                     <TableCell className="p-8">
                       <div className="flex items-center gap-4">

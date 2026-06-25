@@ -21,10 +21,10 @@ export declare class UsersController {
         address?: string;
         role?: Role;
     }): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
         phone: string | null;
         address: string | null;
@@ -38,10 +38,10 @@ export declare class UsersController {
         isVerified: boolean;
     }>;
     getMe(req: any): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
         phone: string | null;
         address: string | null;
@@ -59,14 +59,14 @@ export declare class UsersController {
         phone?: string;
         address?: string;
     }): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;
@@ -82,10 +82,10 @@ export declare class UsersController {
     }>;
     findAll(skip?: string, take?: string): Promise<{
         items: {
+            id: number;
             name: string;
             createdAt: Date;
             updatedAt: Date;
-            id: number;
             email: string;
             phone: string | null;
             address: string | null;
@@ -101,14 +101,14 @@ export declare class UsersController {
         total: number;
     }>;
     update(id: number, data: any): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;
@@ -119,14 +119,14 @@ export declare class UsersController {
         isVerified: boolean;
     }>;
     remove(id: number): Promise<{
+        id: number;
         name: string;
         createdAt: Date;
         updatedAt: Date;
-        id: number;
         email: string;
-        password: string | null;
         phone: string | null;
         address: string | null;
+        password: string | null;
         role: import(".prisma/client").$Enums.Role;
         isBlocked: boolean;
         points: number;
