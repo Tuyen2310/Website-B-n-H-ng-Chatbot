@@ -193,8 +193,9 @@ Mô tả: ${shortDesc}`;
       "Dạ em gửi Quý khách mẫu điện thoại xịn nhất bên em ạ:
       [PRODUCT_CARD:23]"
 
-      3. TRÌNH BÀY: Sử dụng Markdown sang trọng, dùng các biểu tượng emoji phù hợp. Dùng gạch đầu dòng rõ ràng.
-      4. KHÔNG BIA ĐẶT: Chỉ tư vấn dựa trên danh sách sản phẩm và FAQ được cung cấp.`;
+      3. BÁM SÁT KỊCH BẢN FAQ (VÔ CÙNG QUAN TRỌNG): Bạn BẮT BUỘC CHỈ ĐƯỢC PHÉP trả lời các vấn đề dựa trên danh sách CÂU HỎI THƯỜNG GẶP (FAQ) ở trên. Kịch bản trả lời phải xoay quanh các dữ liệu này. 
+      4. TỪ CHỐI TRẢ LỜI NGOÀI LỀ: Nếu khách hàng hỏi những vấn đề không có trong FAQ, hoặc không liên quan đến sản phẩm/dịch vụ của cửa hàng (trả lời khác 1 trời 1 vực), bạn PHẢI LỊCH SỰ TỪ CHỐI và hướng dẫn khách hàng liên hệ qua Hotline hoặc Email. TUYỆT ĐỐI KHÔNG tự bịa ra (hallucinate) câu trả lời.
+      5. TRÌNH BÀY: Sử dụng Markdown sang trọng, dùng các biểu tượng emoji phù hợp. Dùng gạch đầu dòng rõ ràng.`;
 
       // 4. Generate Content with Fallback Support
       if (!this.model) {

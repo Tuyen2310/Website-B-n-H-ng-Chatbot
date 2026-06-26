@@ -199,45 +199,45 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Flash Sale Section - Neon Vibe */}
+      {/* Flash Sale Section - Bright & Vibrant */}
       {mounted && (flashSaleStatus === "ACTIVE" || flashSaleStatus === "UPCOMING") && (
-        <section className="py-20 bg-slate-950 overflow-hidden relative">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-red-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-orange-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <section className="py-20 bg-gradient-to-br from-[#ff3333] via-[#ff5500] to-[#ffaa00] overflow-hidden relative">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/20 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-yellow-300/20 rounded-full blur-[100px] pointer-events-none"></div>
           
           <div className="container mx-auto px-6 relative z-10">
             <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
               <div className="flex flex-col sm:flex-row items-center gap-6 animate-fade-in-up">
                 <div className="flex items-center gap-4">
-                  <Zap className="h-12 w-12 text-red-500 fill-red-500 animate-pulse drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
-                  <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">
+                  <Zap className="h-12 w-12 text-yellow-300 fill-yellow-300 animate-pulse drop-shadow-md" />
+                  <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase drop-shadow-lg">
                     {flashSaleStatus === "UPCOMING" ? "Sắp diễn ra" : "Flash Sale"}
                   </h2>
                 </div>
-                <div className="flex items-center gap-3 bg-white/10 border border-white/20 px-5 py-4 rounded-[1.5rem]">
-                  <span className="text-[10px] font-black text-white uppercase tracking-widest drop-shadow-md">
+                <div className="flex items-center gap-3 bg-white/20 border border-white/40 px-5 py-4 rounded-[1.5rem] backdrop-blur-sm shadow-xl">
+                  <span className="text-[12px] font-black text-white uppercase tracking-widest drop-shadow-md">
                     {flashSaleStatus === "UPCOMING" ? "Mở bán sau:" : "Kết thúc sau:"}
                   </span>
                   <div className="flex items-center gap-2">
-                    <div className="flex flex-col items-center justify-center bg-black/60 text-white font-black text-2xl w-14 h-14 rounded-xl border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                    <div className="flex flex-col items-center justify-center bg-white text-red-600 font-black text-2xl w-14 h-14 rounded-xl shadow-lg">
                       {timeLeft.hours.toString().padStart(2, '0')}
-                      <span className="text-[9px] text-gray-100 font-bold uppercase drop-shadow-sm">Giờ</span>
+                      <span className="text-[9px] text-slate-500 font-bold uppercase">Giờ</span>
                     </div>
-                    <span className="text-red-400 font-black text-2xl animate-pulse drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">:</span>
-                    <div className="flex flex-col items-center justify-center bg-black/60 text-white font-black text-2xl w-14 h-14 rounded-xl border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                    <span className="text-white font-black text-2xl animate-pulse">:</span>
+                    <div className="flex flex-col items-center justify-center bg-white text-red-600 font-black text-2xl w-14 h-14 rounded-xl shadow-lg">
                       {timeLeft.minutes.toString().padStart(2, '0')}
-                      <span className="text-[9px] text-gray-100 font-bold uppercase drop-shadow-sm">Phút</span>
+                      <span className="text-[9px] text-slate-500 font-bold uppercase">Phút</span>
                     </div>
-                    <span className="text-red-400 font-black text-2xl animate-pulse drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">:</span>
-                    <div className="flex flex-col items-center justify-center bg-red-600/30 text-red-100 font-black text-2xl w-14 h-14 rounded-xl border border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.4)]">
+                    <span className="text-white font-black text-2xl animate-pulse">:</span>
+                    <div className="flex flex-col items-center justify-center bg-yellow-400 text-red-700 font-black text-2xl w-14 h-14 rounded-xl shadow-lg">
                       {timeLeft.seconds.toString().padStart(2, '0')}
-                      <span className="text-[9px] text-red-100 font-bold uppercase drop-shadow-sm">Giây</span>
+                      <span className="text-[9px] text-red-800 font-bold uppercase">Giây</span>
                     </div>
                   </div>
                 </div>
               </div>
-              <Link href="/shop?flashSale=true" className="text-white hover:text-red-400 font-black flex items-center gap-2 hover:gap-4 transition-all uppercase tracking-wider text-sm drop-shadow-md">
+              <Link href="/shop?flashSale=true" className="text-white hover:text-yellow-200 font-black flex items-center gap-2 hover:gap-4 transition-all uppercase tracking-wider text-sm drop-shadow-md bg-black/20 px-6 py-3 rounded-full backdrop-blur-sm hover:bg-black/30">
                 Xem tất cả deal <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -245,33 +245,33 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {isProductsLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-80 rounded-[2rem] bg-white/10" />
+                  <Skeleton key={i} className="h-80 rounded-[2rem] bg-white/50" />
                 ))
               ) : trendingProducts.filter((p: any) => p.isFlashSale).slice(0, 4).map((product: any, idx: number) => {
                 const discountPercent = Math.round(((product.price - product.flashSalePrice) / product.price) * 100);
                 return (
-                <div key={product.id} className={`bg-slate-900/80 backdrop-blur-md rounded-[2rem] p-4 flex flex-col justify-between group hover:-translate-y-2 transition-all duration-500 relative cursor-pointer border border-white/10 hover:border-red-400 hover:shadow-[0_15px_40px_-10px_rgba(239,68,68,0.5)] animate-slide-up animate-stagger-${(idx % 4) + 1}`} onClick={() => window.location.href = `/shop/${product.id}`}>
-                  <div className="absolute top-4 left-4 z-10 bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-xl uppercase tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.8)] backdrop-blur-md">
+                <div key={product.id} className={`bg-white rounded-[2rem] p-4 flex flex-col justify-between group hover:-translate-y-2 transition-all duration-500 relative cursor-pointer border-2 border-transparent hover:border-red-500 hover:shadow-2xl shadow-lg animate-slide-up animate-stagger-${(idx % 4) + 1}`} onClick={() => window.location.href = `/shop/${product.id}`}>
+                  <div className="absolute top-4 left-4 z-10 bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-xl uppercase tracking-widest shadow-md">
                     -{discountPercent}%
                   </div>
-                  <div className="aspect-square bg-slate-800 rounded-[1.5rem] mb-5 overflow-hidden relative p-4 flex items-center justify-center shadow-inner">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-red-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <img src={product.images?.[0] || "https://via.placeholder.com/400"} alt={product.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-[0_10px_20px_rgba(255,255,255,0.1)]" />
+                  <div className="aspect-square bg-gray-50 rounded-[1.5rem] mb-5 overflow-hidden relative p-4 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <img src={product.images?.[0] || "https://via.placeholder.com/400"} alt={product.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 mix-blend-multiply" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-white line-clamp-1 mb-2 group-hover:text-red-300 transition-colors drop-shadow-sm">{product.name}</h3>
+                    <h3 className="text-base font-black text-slate-900 line-clamp-1 mb-2 group-hover:text-red-600 transition-colors">{product.name}</h3>
                     <div className="flex items-center gap-3">
-                      <span className="text-red-400 font-black text-xl drop-shadow-[0_0_10px_rgba(239,68,68,0.6)]"><Price amount={product.flashSalePrice} /></span>
-                      <span className="text-gray-300 text-xs line-through font-bold drop-shadow-sm"><Price amount={product.price} /></span>
+                      <span className="text-red-600 font-black text-xl"><Price amount={product.flashSalePrice} /></span>
+                      <span className="text-slate-400 text-xs line-through font-bold"><Price amount={product.price} /></span>
                     </div>
-                    <div className="mt-4 bg-slate-700 rounded-full h-2 w-full overflow-hidden relative border border-white/5">
-                      <div className="bg-gradient-to-r from-red-500 to-yellow-400 h-full w-[85%] rounded-full absolute left-0 top-0 shadow-[0_0_15px_rgba(239,68,68,1)]"></div>
+                    <div className="mt-4 bg-slate-200 rounded-full h-2 w-full overflow-hidden relative">
+                      <div className="bg-gradient-to-r from-red-500 to-orange-400 h-full w-[85%] rounded-full absolute left-0 top-0 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
                     </div>
                     <div className="flex justify-between items-center mt-2">
-                      <p className="text-[10px] font-black text-red-300 uppercase tracking-widest drop-shadow-sm">
+                      <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">
                         {flashSaleStatus === "UPCOMING" ? "Sắp mở bán" : "Sắp hết hàng"}
                       </p>
-                      <p className="text-[10px] font-black text-white drop-shadow-sm">Đã bán 85%</p>
+                      <p className="text-[10px] font-black text-slate-500">Đã bán 85%</p>
                     </div>
                   </div>
                 </div>

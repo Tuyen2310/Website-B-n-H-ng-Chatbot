@@ -11,8 +11,18 @@ async function bootstrap() {
   
   app.use(helmet());
   app.use(compression()); // Bật nén Gzip để tăng tốc tải trang
+  const allowedOrigins = [
+    'http://localhost:3000', 
+    'http://smartshop.local:3000', 
+    'http://127.0.0.1:3000',
+    'https://website-b-n-h-ng-chatbot.vercel.app'
+  ];
+  if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  }
+
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://smartshop.local:3000', 'http://127.0.0.1:3000'],
+    origin: allowedOrigins,
     credentials: true,
   });
   app.setGlobalPrefix('api');
