@@ -130,7 +130,8 @@ function LoginForm() {
             variant="outline"
             className="w-full h-12 rounded-xl text-base font-extrabold bg-white hover:bg-gray-50 text-gray-700 hover:scale-[1.01] transition-all"
             onClick={() => {
-              const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+              let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+              if (!apiUrl.endsWith('/api')) apiUrl += '/api';
               window.location.href = `${apiUrl}/auth/google`;
             }}
           >
