@@ -7,6 +7,36 @@ export class MailService {
 
   constructor(private readonly mailerService: MailerService) {}
 
+  private async executeSendMail(mailOptions: any) {
+    const useBridge = process.env.USE_MAIL_BRIDGE === 'true';
+    if (useBridge) {
+      const bridgeUrl = (process.env.FRONTEND_URL || 'http://localhost:3000') + '/api/mail';
+      const secret = process.env.MAIL_BRIDGE_SECRET || 'fallback_secret';
+      
+      const response = await fetch(bridgeUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-mail-bridge-secret': secret
+        },
+        body: JSON.stringify({
+          to: mailOptions.to,
+          subject: mailOptions.subject,
+          text: mailOptions.text,
+          html: mailOptions.html,
+        })
+      });
+      
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Mail bridge failed with status ${response.status}: ${errText}`);
+      }
+      return await response.json();
+    } else {
+      return await this.mailerService.sendMail(mailOptions);
+    }
+  }
+
   async sendOrderConfirmation(email: string, orderDetails: any) {
     try {
       const itemsHtml = (orderDetails.items || []).map((item: any) => `
@@ -84,7 +114,7 @@ export class MailService {
         </div>
       `;
 
-      await this.mailerService.sendMail({
+      await this.executeSendMail({
         to: email,
         subject: `Hóa đơn điện tử - Đơn hàng #${orderDetails.id}`,
         html: html,
@@ -97,7 +127,7 @@ export class MailService {
 
   async sendWelcomeEmail(email: string, name: string) {
     try {
-      await this.mailerService.sendMail({
+      await this.executeSendMail({
         to: email,
         subject: `Chào mừng đến với SmartShop!`,
         text: `Xin chào ${name}, cảm ơn bạn đã đăng ký tài khoản tại SmartShop.`,
@@ -140,7 +170,7 @@ export class MailService {
         </div>
       `;
 
-      await this.mailerService.sendMail({
+      await this.executeSendMail({
         to: email,
         subject: `[SmartShop] Mã xác thực OTP của bạn là: ${otpCode}`,
         html: html,
@@ -165,7 +195,7 @@ export class MailService {
       const shippingLink = quickActionBase + 'SHIPPING';
       const cancelLink = quickActionBase + 'CANCELLED';
 
-      await this.mailerService.sendMail({
+      await this.executeSendMail({
         to: adminEmails,
         subject: `[CẢNH BÁO] Có đơn hàng mới #${orderDetails.id} - ${orderDetails.totalAmount}đ`,
         html: `
