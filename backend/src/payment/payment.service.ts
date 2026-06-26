@@ -23,8 +23,7 @@ export class PaymentService {
 
     // Simulate VNPay gateway link generation
     const paymentId = `VNPAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const frontendUrl = process.env.FRONTEND_URL || 'http://smartshop.local:3000';
-    const mockPaymentUrl = `${frontendUrl}/payment/gateway?orderId=${orderId}&paymentId=${paymentId}&method=${method}&amount=${order.totalAmount}`;
+    const mockPaymentUrl = `/payment/gateway?orderId=${orderId}&paymentId=${paymentId}&method=${method}&amount=${order.totalAmount}`;
 
     // Store payment info in DB
     await this.prisma.order.update({
