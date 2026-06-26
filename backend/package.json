@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "render-build": "npx prisma@6 generate && npx prisma@6 db push --accept-data-loss && npm run db:seed && nest build",
+    "render-build": "npx prisma@6 generate && npx prisma@6 db push --accept-data-loss && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
