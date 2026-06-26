@@ -118,21 +118,19 @@ function PaymentGatewayInner() {
             <Button 
               className="w-full h-14 rounded-2xl text-lg font-black uppercase tracking-widest bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/20 flex items-center gap-2"
               onClick={async () => {
+                if (!paymentId) return;
                 try {
-                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://smartshop.local:3000/api'}/payment/webhook`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ paymentId, status: 'SUCCESS' })
-                  });
-                  if (res.ok) {
-                    alert('Thanh toán thành công! Trạng thái đơn hàng đã được cập nhật.');
-                    router.push(`/orders/${orderId}`);
-                  } else {
-                    alert('Có lỗi xảy ra khi giả lập thanh toán.');
-                  }
+                  // Import and use paymentApi dynamically to avoid top-level import circular dependencies if any, or just import it at top.
+                  // Actually since we are in page.tsx, we can just import paymentApi.
+                  // Wait, I should add import { paymentApi } from "@/lib/api"; at the top, or just use it if it's already there. Let me check if it's imported.
+                  // If not, I'll just use the same logic but dynamically import to be safe, or just import at the top. Let's look at line 122.
+                  const { paymentApi } = await import('@/lib/api');
+                  await paymentApi.mockWebhook(paymentId, 'SUCCESS');
+                  alert('Thanh toán thành công! Trạng thái đơn hàng đã được cập nhật.');
+                  router.push(`/orders/${orderId}`);
                 } catch (err) {
                   console.error(err);
-                  alert('Lỗi kết nối đến server.');
+                  alert('Có lỗi xảy ra khi giả lập thanh toán.');
                 }
               }}
             >

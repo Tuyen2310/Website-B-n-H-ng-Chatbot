@@ -10,7 +10,8 @@ import { ConfigService } from '@nestjs/config';
       useFactory: async (config: ConfigService) => ({
         transport: {
           host: config.get('MAIL_HOST', 'smtp.ethereal.email'),
-          port: config.get('MAIL_PORT', 587),
+          port: Number(config.get('MAIL_PORT', 587)),
+          secure: Number(config.get('MAIL_PORT', 587)) === 465, // true for 465, false for other ports
           auth: {
             user: config.get('MAIL_USER', 'test@ethereal.email'),
             pass: config.get('MAIL_PASS', 'test_password'),
