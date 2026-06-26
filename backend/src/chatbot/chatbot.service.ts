@@ -197,22 +197,37 @@ Mô tả: ${shortDesc}`;
       4. TỪ CHỐI TRẢ LỜI NGOÀI LỀ: Nếu khách hàng hỏi những vấn đề không có trong FAQ, hoặc không liên quan đến sản phẩm/dịch vụ của cửa hàng (trả lời khác 1 trời 1 vực), bạn PHẢI LỊCH SỰ TỪ CHỐI và hướng dẫn khách hàng liên hệ qua Hotline hoặc Email. TUYỆT ĐỐI KHÔNG tự bịa ra (hallucinate) câu trả lời.
       5. TRÌNH BÀY: Sử dụng Markdown sang trọng, dùng các biểu tượng emoji phù hợp. Dùng gạch đầu dòng rõ ràng.`;
 
-      // 4. Generate Content with Fallback Support
-      if (!this.model) {
+      // 4. Generate Content with Robust Fallback
+      if (!this.genAI) {
         throw new Error('AI Model is not initialized properly');
       }
 
       let result;
-      try {
-        result = await this.model.generateContent([
-          { text: systemPrompt },
-          { text: `Khách hàng hỏi: "${message}"` },
-        ]);
-      } catch (genError: any) {
-        this.logger.error(`Generation failed with ${(this as any)._currentModelName}:`, genError.message);
-        // If it's a model-not-found error, we reset for next call to try another model
-        this.model = null; 
-        throw genError;
+      let lastError;
+      const preferredModel = (this as any)._currentModelName || 'gemini-2.5-flash';
+      const baseModels = ['gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-3.5-flash'];
+      const modelsToTry = [...new Set([preferredModel, ...baseModels])];
+
+      for (const modelName of modelsToTry) {
+        try {
+          const tryModel = this.genAI.getGenerativeModel({ model: modelName });
+          result = await tryModel.generateContent([
+            { text: systemPrompt },
+            { text: `Khách hàng hỏi: "${message}"` },
+          ]);
+          // If successful, update the current model to this one for future calls
+          this.model = tryModel;
+          (this as any)._currentModelName = modelName;
+          break; // Exit loop on success
+        } catch (genError: any) {
+          this.logger.warn(`Generation failed with ${modelName}: ${genError.message}`);
+          lastError = genError;
+        }
+      }
+
+      if (!result) {
+        this.model = null; // Reset if all failed
+        throw lastError;
       }
 
       const responseText = result.response.text();

@@ -185,20 +185,33 @@ Mô tả: ${shortDesc}`;
       3. BÁM SÁT KỊCH BẢN FAQ (VÔ CÙNG QUAN TRỌNG): Bạn BẮT BUỘC CHỈ ĐƯỢC PHÉP trả lời các vấn đề dựa trên danh sách CÂU HỎI THƯỜNG GẶP (FAQ) ở trên. Kịch bản trả lời phải xoay quanh các dữ liệu này. 
       4. TỪ CHỐI TRẢ LỜI NGOÀI LỀ: Nếu khách hàng hỏi những vấn đề không có trong FAQ, hoặc không liên quan đến sản phẩm/dịch vụ của cửa hàng (trả lời khác 1 trời 1 vực), bạn PHẢI LỊCH SỰ TỪ CHỐI và hướng dẫn khách hàng liên hệ qua Hotline hoặc Email. TUYỆT ĐỐI KHÔNG tự bịa ra (hallucinate) câu trả lời.
       5. TRÌNH BÀY: Sử dụng Markdown sang trọng, dùng các biểu tượng emoji phù hợp. Dùng gạch đầu dòng rõ ràng.`;
-            if (!this.model) {
+            if (!this.genAI) {
                 throw new Error('AI Model is not initialized properly');
             }
             let result;
-            try {
-                result = await this.model.generateContent([
-                    { text: systemPrompt },
-                    { text: `Khách hàng hỏi: "${message}"` },
-                ]);
+            let lastError;
+            const preferredModel = this._currentModelName || 'gemini-2.5-flash';
+            const baseModels = ['gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-3.5-flash'];
+            const modelsToTry = [...new Set([preferredModel, ...baseModels])];
+            for (const modelName of modelsToTry) {
+                try {
+                    const tryModel = this.genAI.getGenerativeModel({ model: modelName });
+                    result = await tryModel.generateContent([
+                        { text: systemPrompt },
+                        { text: `Khách hàng hỏi: "${message}"` },
+                    ]);
+                    this.model = tryModel;
+                    this._currentModelName = modelName;
+                    break;
+                }
+                catch (genError) {
+                    this.logger.warn(`Generation failed with ${modelName}: ${genError.message}`);
+                    lastError = genError;
+                }
             }
-            catch (genError) {
-                this.logger.error(`Generation failed with ${this._currentModelName}:`, genError.message);
+            if (!result) {
                 this.model = null;
-                throw genError;
+                throw lastError;
             }
             const responseText = result.response.text();
             await this.prisma.chatbotLog.create({

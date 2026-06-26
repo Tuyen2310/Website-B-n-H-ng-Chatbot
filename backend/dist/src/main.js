@@ -13,8 +13,17 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.use((0, helmet_1.default)());
     app.use((0, compression_1.default)());
+    const allowedOrigins = [
+        'http://localhost:3000',
+        'http://smartshop.local:3000',
+        'http://127.0.0.1:3000',
+        'https://website-b-n-h-ng-chatbot.vercel.app'
+    ];
+    if (process.env.FRONTEND_URL) {
+        allowedOrigins.push(process.env.FRONTEND_URL);
+    }
     app.enableCors({
-        origin: ['http://localhost:3000', 'http://smartshop.local:3000', 'http://127.0.0.1:3000'],
+        origin: allowedOrigins,
         credentials: true,
     });
     app.setGlobalPrefix('api');
