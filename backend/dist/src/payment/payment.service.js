@@ -32,8 +32,7 @@ let PaymentService = class PaymentService {
             throw new Error('System settings not initialized');
         const paymentInfo = settings.payment;
         const paymentId = `VNPAY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-        const frontendUrl = process.env.FRONTEND_URL || 'http://smartshop.local:3000';
-        const mockPaymentUrl = `${frontendUrl}/payment/gateway?orderId=${orderId}&paymentId=${paymentId}&method=${method}&amount=${order.totalAmount}`;
+        const mockPaymentUrl = `/payment/gateway?orderId=${orderId}&paymentId=${paymentId}&method=${method}&amount=${order.totalAmount}`;
         await this.prisma.order.update({
             where: { id: orderId },
             data: {

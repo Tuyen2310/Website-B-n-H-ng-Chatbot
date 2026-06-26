@@ -203,6 +203,7 @@ export default function ChatbotWidget() {
       suggestions: []
     }
   ]);
+  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: faqs } = useQuery({
@@ -225,24 +226,95 @@ export default function ChatbotWidget() {
     }
   }, [messages]);
 
-  const mutation = useMutation({
-    mutationFn: (msg: string) => catalogApi.sendMessage(msg),
-    onSuccess: (data) => {
-      setMessages((prev) => [...prev, { role: "bot", content: data.response, suggestions: data.suggestions }]);
-    },
-    onError: () => {
-      setMessages((prev) => [...prev, { role: "bot", content: "Xin lỗi, tôi đang gặp sự cố kỹ thuật. Vui lòng thử lại sau hoặc liên hệ hỗ trợ." }]);
+  const handleSend = async (e: React.FormEvent | string) => {
+    let userMsg = '';
+    if (typeof e === 'string') {
+      userMsg = e;
+    } else {
+      e.preventDefault();
+      userMsg = input.trim();
     }
-  });
+    
+    if (!userMsg || isTyping) return;
 
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || mutation.isPending) return;
-
-    const userMsg = input.trim();
     setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
     setInput("");
-    mutation.mutate(userMsg);
+    setIsTyping(true);
+
+    // Add empty bot message
+    setMessages((prev) => [...prev, { role: "bot", content: "", suggestions: [] }]);
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers: any = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+      const apiUrl = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
+
+      const response = await fetch(`${apiUrl}/chatbot/stream`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ message: userMsg }),
+      });
+
+      if (!response.body) throw new Error('ReadableStream not supported');
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let botResponse = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Chunk can contain multiple 'data: {...}\n\n'
+        const lines = chunk.split('\n\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.slice(6);
+            if (!dataStr) continue;
+            try {
+              const data = JSON.parse(dataStr);
+              if (data.error) {
+                botResponse += `\n*(Lỗi kỹ thuật: ${data.error})*`;
+                setMessages(prev => {
+                  const newMsgs = [...prev];
+                  newMsgs[newMsgs.length - 1].content = botResponse;
+                  return newMsgs;
+                });
+                break;
+              }
+              if (data.text) {
+                botResponse += data.text;
+                setMessages(prev => {
+                  const newMsgs = [...prev];
+                  newMsgs[newMsgs.length - 1].content = botResponse;
+                  return newMsgs;
+                });
+              }
+              if (data.done) {
+                setMessages(prev => {
+                  const newMsgs = [...prev];
+                  newMsgs[newMsgs.length - 1].suggestions = data.suggestions || [];
+                  return newMsgs;
+                });
+              }
+            } catch(e) {}
+          }
+        }
+      }
+    } catch (err) {
+      setMessages(prev => {
+        const newMsgs = [...prev];
+        newMsgs[newMsgs.length - 1].content += "\nXin lỗi, tôi đang gặp sự cố kết nối.";
+        return newMsgs;
+      });
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleEndChat = () => {
@@ -311,15 +383,10 @@ export default function ChatbotWidget() {
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Hide suggestions after clicking to keep chat clean (like FB Messenger)
-                          setMessages(prev => {
-                            const newMsgs = [...prev];
-                            newMsgs[i] = { ...newMsgs[i], suggestions: [] };
-                            return [...newMsgs, { role: "user", content: reply }];
-                          });
-                          mutation.mutate(reply);
+                          setInput(reply);
+                          handleSend(reply);
                         }}
-                        disabled={mutation.isPending}
+                        disabled={isTyping}
                         className="px-4 py-2.5 rounded-[1.5rem] bg-white border-2 border-[#0044CC]/10 text-[#0044CC] text-[13px] font-bold hover:bg-[#0044CC] hover:text-white hover:border-[#0044CC] transition-all shadow-sm active:scale-95"
                       >
                         {reply}
@@ -329,7 +396,7 @@ export default function ChatbotWidget() {
                 )}
               </div>
             ))}
-            {mutation.isPending && (
+            {isTyping && (
               <div className="flex justify-start">
                 <div className="flex gap-4 max-w-[80%]">
                   <div className="h-11 w-11 rounded-xl bg-white border border-gray-100 flex items-center justify-center shadow-md">
@@ -362,7 +429,7 @@ export default function ChatbotWidget() {
                 type="submit" 
                 size="icon" 
                 className="h-10 w-10 rounded-xl shadow-lg shadow-[#0044CC]/20 shrink-0 bg-[#0044CC] hover:bg-[#041B3C] transition-all hover:scale-105 active:scale-95" 
-                disabled={mutation.isPending || !input.trim()}
+                disabled={isTyping || !input.trim()}
               >
                 <Send className="h-5 w-5" />
               </Button>

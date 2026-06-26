@@ -230,6 +230,113 @@ Mô tả: ${shortDesc}`;
             return { response: `Dạ, tôi đang gặp một chút gián đoạn kỹ thuật. ${detailedError} Quý khách vui lòng nhắn lại sau giây lát hoặc gọi hotline **${phone}** để được hỗ trợ ngay ạ!` };
         }
     }
+    async chatStream(message, userId, res) {
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders();
+        const cleanMessage = message.toLowerCase().trim();
+        let shopInfo = null;
+        let faqs = [];
+        let directMatch = null;
+        try {
+            const [latestSettings, dbFaqs, products] = await Promise.all([
+                this.prisma.settings.findFirst({ orderBy: { updatedAt: 'desc' } }),
+                this.prisma.fAQ.findMany({ where: { isDeleted: false } }),
+                this.prisma.product.findMany({ where: { isDeleted: false }, take: 50 }),
+            ]);
+            shopInfo = latestSettings || { shopName: 'SmartShop AI', tagline: 'Trải nghiệm mua sắm thông minh', email: 'support@smartshop.com', phone: '0987654321', address: 'Hà Nội' };
+            faqs = dbFaqs;
+            let matchedFaqContext = '';
+            directMatch = faqs.find(f => {
+                const q = f.question.toLowerCase().trim();
+                return cleanMessage === q || cleanMessage.includes(q) || q.includes(cleanMessage);
+            });
+            if (directMatch && cleanMessage.length > 5) {
+                matchedFaqContext = `\n[CỰC KỲ QUAN TRỌNG] KHÁCH HÀNG VỪA HỎI CÂU HỎI FAQ. BẠN BẮT BUỘC PHẢI GIỮ NGUYÊN VĂN BẢN TRẢ LỜI CỦA CỬA HÀNG NHƯ SAU: "${directMatch.answer}".`;
+            }
+            const productContext = products.map(p => `Mã Thẻ: [PRODUCT_CARD:${p.id}]\nTên: ${p.name}\nGiá: ${p.price.toLocaleString('vi-VN')}đ`).join('\n\n');
+            const faqContext = faqs.map(f => `Q: ${f.question} -> A: ${f.answer}`).join('\n');
+            let userHistory = '';
+            if (userId) {
+                const pastOrders = await this.prisma.order.findMany({ where: { userId }, include: { items: { include: { product: true } } }, take: 3, orderBy: { createdAt: 'desc' } });
+                if (pastOrders.length > 0) {
+                    const orderDetails = pastOrders.map(o => `Mã đơn #${o.id} - Trạng thái: ${o.status}`).join(' | ');
+                    userHistory = `LỊCH SỬ ĐƠN HÀNG CỦA KHÁCH: ${orderDetails}.`;
+                }
+            }
+            const systemPrompt = `Bạn là chuyên gia tư vấn mua sắm AI cao cấp tại **${shopInfo.shopName}**. 
+      Slogan: "${shopInfo.tagline}"
+
+      THÔNG TIN CỬA HÀNG:
+      - Hotline: **${shopInfo.phone}** | Email: **${shopInfo.email}**
+      - Địa chỉ: ${shopInfo.address}
+
+      ${userHistory}
+      ${matchedFaqContext}
+
+      DANH SÁCH SẢN PHẨM HIỆN CÓ:
+      ${productContext}
+
+      CÂU HỎI THƯỜNG GẶP (FAQ):
+      ${faqContext}
+
+      NGUYÊN TẮC PHỤC VỤ:
+      1. GIỌNG ĐIỆU: Chuyên nghiệp, nồng hậu. Gọi khách hàng là "Quý khách" hoặc "Anh/Chị".
+      2. TƯ VẤN SẢN PHẨM: Khi giới thiệu sản phẩm, bạn BẮT BUỘC chỉ được xuất ra đúng 1 dòng mã Thẻ Sản Phẩm duy nhất (vd: [PRODUCT_CARD:15]). TUYỆT ĐỐI KHÔNG tự gõ lại tên sản phẩm.
+      3. BÁM SÁT KỊCH BẢN FAQ. 
+      4. TỪ CHỐI TRẢ LỜI NGOÀI LỀ.`;
+            let apiKey = this._lastApiKey || process.env.GEMINI_API_KEY;
+            if (!apiKey && latestSettings?.chatbotApiKey)
+                apiKey = latestSettings.chatbotApiKey;
+            if (!apiKey) {
+                res.write(`data: ${JSON.stringify({ error: 'Chưa cấu hình API Key' })}\n\n`);
+                return res.end();
+            }
+            const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
+            let stream;
+            let lastError;
+            const modelsToTry = ['gemini-1.5-flash', 'gemini-flash-latest'];
+            for (const modelName of modelsToTry) {
+                try {
+                    const tryModel = genAI.getGenerativeModel({ model: modelName });
+                    const result = await tryModel.generateContentStream([
+                        { text: systemPrompt },
+                        { text: `Khách hàng hỏi: "${message}"` },
+                    ]);
+                    stream = result.stream;
+                    break;
+                }
+                catch (genError) {
+                    this.logger.warn(`Stream failed with ${modelName}: ${genError.message}`);
+                    lastError = genError;
+                }
+            }
+            if (!stream) {
+                res.write(`data: ${JSON.stringify({ error: lastError?.message || 'Technical Error' })}\n\n`);
+                return res.end();
+            }
+            let fullResponse = '';
+            for await (const chunk of stream) {
+                const chunkText = chunk.text();
+                fullResponse += chunkText;
+                res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
+            }
+            const otherFaqs = faqs.filter(f => f.id !== directMatch?.id);
+            const shuffled = otherFaqs.sort(() => 0.5 - Math.random());
+            const suggestions = shuffled.slice(0, 3).map(f => f.question);
+            res.write(`data: ${JSON.stringify({ done: true, suggestions })}\n\n`);
+            res.end();
+            await this.prisma.chatbotLog.create({
+                data: { userId, question: message, answer: fullResponse },
+            });
+        }
+        catch (error) {
+            this.logger.error('Chatbot stream error:', error.message);
+            res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+            res.end();
+        }
+    }
 };
 exports.ChatbotService = ChatbotService;
 exports.ChatbotService = ChatbotService = ChatbotService_1 = __decorate([

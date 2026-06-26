@@ -126,7 +126,7 @@ export class OrdersService {
             create: orderItemsData,
           },
         } as any,
-        include: { items: { include: { product: true } } },
+        include: { items: { include: { product: true } }, user: true },
       });
 
       // Thông báo cho admin

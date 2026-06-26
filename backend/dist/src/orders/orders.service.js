@@ -120,7 +120,7 @@ let OrdersService = class OrdersService {
                         create: orderItemsData,
                     },
                 },
-                include: { items: { include: { product: true } } },
+                include: { items: { include: { product: true } }, user: true },
             });
             try {
                 this.notificationsService.sendNewOrderAlert(order);

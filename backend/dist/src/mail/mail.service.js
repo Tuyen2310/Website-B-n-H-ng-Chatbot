@@ -19,6 +19,34 @@ let MailService = MailService_1 = class MailService {
     constructor(mailerService) {
         this.mailerService = mailerService;
     }
+    async executeSendMail(mailOptions) {
+        const useBridge = process.env.USE_MAIL_BRIDGE === 'true';
+        if (useBridge) {
+            const bridgeUrl = (process.env.FRONTEND_URL || 'http://localhost:3000') + '/api/mail';
+            const secret = process.env.MAIL_BRIDGE_SECRET || 'fallback_secret';
+            const response = await fetch(bridgeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-mail-bridge-secret': secret
+                },
+                body: JSON.stringify({
+                    to: mailOptions.to,
+                    subject: mailOptions.subject,
+                    text: mailOptions.text,
+                    html: mailOptions.html,
+                })
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`Mail bridge failed with status ${response.status}: ${errText}`);
+            }
+            return await response.json();
+        }
+        else {
+            return await this.mailerService.sendMail(mailOptions);
+        }
+    }
     async sendOrderConfirmation(email, orderDetails) {
         try {
             const itemsHtml = (orderDetails.items || []).map((item) => `
@@ -94,7 +122,7 @@ let MailService = MailService_1 = class MailService {
           </div>
         </div>
       `;
-            await this.mailerService.sendMail({
+            await this.executeSendMail({
                 to: email,
                 subject: `Hóa đơn điện tử - Đơn hàng #${orderDetails.id}`,
                 html: html,
@@ -107,7 +135,7 @@ let MailService = MailService_1 = class MailService {
     }
     async sendWelcomeEmail(email, name) {
         try {
-            await this.mailerService.sendMail({
+            await this.executeSendMail({
                 to: email,
                 subject: `Chào mừng đến với SmartShop!`,
                 text: `Xin chào ${name}, cảm ơn bạn đã đăng ký tài khoản tại SmartShop.`,
@@ -149,7 +177,7 @@ let MailService = MailService_1 = class MailService {
           </div>
         </div>
       `;
-            await this.mailerService.sendMail({
+            await this.executeSendMail({
                 to: email,
                 subject: `[SmartShop] Mã xác thực OTP của bạn là: ${otpCode}`,
                 html: html,
@@ -164,12 +192,12 @@ let MailService = MailService_1 = class MailService {
     }
     async sendAdminNewOrderAlert(adminEmails, orderDetails, token) {
         try {
-            const backendUrl = process.env.API_URL || 'http://smartshop.local:3001';
+            const backendUrl = process.env.BACKEND_URL || process.env.API_URL || 'http://localhost:3001';
             const quickActionBase = `${backendUrl}/api/orders/quick-status?id=${orderDetails.id}&token=${token}&status=`;
             const confirmLink = quickActionBase + 'CONFIRMED';
             const shippingLink = quickActionBase + 'SHIPPING';
             const cancelLink = quickActionBase + 'CANCELLED';
-            await this.mailerService.sendMail({
+            await this.executeSendMail({
                 to: adminEmails,
                 subject: `[CẢNH BÁO] Có đơn hàng mới #${orderDetails.id} - ${orderDetails.totalAmount}đ`,
                 html: `

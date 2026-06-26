@@ -26,6 +26,10 @@ let ChatbotController = class ChatbotController {
         const userId = req.user?.userId;
         return this.chatbotService.chat(message, userId);
     }
+    async chatStream(message, req, res) {
+        const userId = req.user?.userId;
+        return this.chatbotService.chatStream(message, userId, res);
+    }
 };
 exports.ChatbotController = ChatbotController;
 __decorate([
@@ -38,6 +42,17 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ChatbotController.prototype, "chat", null);
+__decorate([
+    (0, common_1.Post)('stream'),
+    (0, common_1.UseGuards)(optional_jwt_auth_guard_1.OptionalJwtAuthGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Chat with the AI assistant (Streaming)' }),
+    __param(0, (0, common_1.Body)('message')),
+    __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], ChatbotController.prototype, "chatStream", null);
 exports.ChatbotController = ChatbotController = __decorate([
     (0, swagger_1.ApiTags)('chatbot'),
     (0, common_1.Controller)('chatbot'),

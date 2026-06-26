@@ -16,4 +16,5 @@ export declare class ChatbotService implements OnModuleInit {
         response: any;
         suggestions: string[];
     }>;
+    chatStream(message: string, userId: number | undefined, res: any): Promise<any>;
 }

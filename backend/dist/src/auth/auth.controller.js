@@ -33,8 +33,8 @@ let AuthController = class AuthController {
     }
     async googleAuthRedirect(req, res) {
         const jwt = await this.authService.validateOAuthLogin(req.user);
-        const frontendUrl = 'http://smartshop.local:3000/auth/callback';
-        return res.redirect(`${frontendUrl}?token=${jwt.access_token}&user=${encodeURIComponent(JSON.stringify(jwt.user))}`);
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        return res.redirect(`${frontendUrl}/auth/callback?token=${jwt.access_token}&user=${encodeURIComponent(JSON.stringify(jwt.user))}`);
     }
 };
 exports.AuthController = AuthController;

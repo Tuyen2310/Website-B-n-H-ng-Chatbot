@@ -11,6 +11,24 @@ export declare class OrdersService {
     private mailService;
     constructor(prisma: PrismaService, promotionsService: PromotionsService, notificationsService: NotificationsService, mailService: MailService);
     create(userId: number | null, createOrderDto: CreateOrderDto): Promise<{
+        user: {
+            id: number;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            email: string;
+            phone: string | null;
+            address: string | null;
+            password: string | null;
+            role: import(".prisma/client").$Enums.Role;
+            isBlocked: boolean;
+            points: number;
+            googleId: string | null;
+            avatar: string | null;
+            otpCode: string | null;
+            otpExpires: Date | null;
+            isVerified: boolean;
+        } | null;
         items: ({
             product: {
                 id: number;

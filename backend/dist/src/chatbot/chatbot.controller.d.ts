@@ -9,4 +9,5 @@ export declare class ChatbotController {
         response: any;
         suggestions: string[];
     }>;
+    chatStream(message: string, req: any, res: any): Promise<any>;
 }
