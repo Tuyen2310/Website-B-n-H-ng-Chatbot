@@ -331,7 +331,10 @@ Mô tả: ${shortDesc}`;
       let stream;
       let lastError;
       
-      const modelsToTry = ['gemini-1.5-flash', 'gemini-flash-latest'];
+      const preferredModel = (this as any)._currentModelName || 'gemini-2.5-flash';
+      const baseModels = ['gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-3.5-flash'];
+      const modelsToTry = [...new Set([preferredModel, ...baseModels])];
+      
       for (const modelName of modelsToTry) {
         try {
           const tryModel = genAI.getGenerativeModel({ model: modelName });
