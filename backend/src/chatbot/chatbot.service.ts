@@ -226,8 +226,25 @@ Mô tả: ${shortDesc}`;
       }
 
       if (!result) {
-        this.model = null; // Reset if all failed
-        throw lastError;
+        this.logger.warn('AI models exhausted. Triggering Fallback logic.');
+        let fallbackResponse = '';
+        if (directMatch) {
+            fallbackResponse = directMatch.answer;
+        } else {
+            const phone = shopInfo?.phone || '0987654321';
+            fallbackResponse = `Dạ, hiện tại hệ thống AI bên em đang quá tải. Quý khách vui lòng tham khảo các câu hỏi bên dưới hoặc gọi hotline **${phone}** để được hỗ trợ trực tiếp ạ!`;
+        }
+
+        await this.prisma.chatbotLog.create({
+            data: { userId, question: message, answer: fallbackResponse + ' (Fallback)' },
+        });
+
+        let suggestions: string[] = [];
+        const otherFaqs = faqs.filter(f => f.id !== directMatch?.id);
+        const shuffled = otherFaqs.sort(() => 0.5 - Math.random());
+        suggestions = shuffled.slice(0, 3).map(f => f.question);
+
+        return { response: fallbackResponse, suggestions };
       }
 
       const responseText = result.response.text();
@@ -351,8 +368,34 @@ Mô tả: ${shortDesc}`;
       }
 
       if (!stream) {
-        res.write(`data: ${JSON.stringify({ error: lastError?.message || 'Technical Error' })}\n\n`);
-        return res.end();
+        this.logger.warn('AI models exhausted. Triggering Stream Fallback logic.');
+        let fallbackResponse = '';
+        if (directMatch) {
+            fallbackResponse = directMatch.answer;
+        } else {
+            const phone = shopInfo?.phone || '0987654321';
+            fallbackResponse = `Dạ, hiện tại hệ thống AI bên em đang quá tải. Quý khách vui lòng tham khảo các câu hỏi bên dưới hoặc gọi hotline **${phone}** để được hỗ trợ trực tiếp ạ!`;
+        }
+
+        // Simulate streaming for fallback response
+        const chunks = fallbackResponse.match(/.{1,10}/g) || [fallbackResponse];
+        for (const chunk of chunks) {
+            res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+            // Add slight delay to make it look like natural typing
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
+        const otherFaqs = faqs.filter(f => f.id !== directMatch?.id);
+        const shuffled = otherFaqs.sort(() => 0.5 - Math.random());
+        const suggestions = shuffled.slice(0, 3).map(f => f.question);
+
+        res.write(`data: ${JSON.stringify({ done: true, suggestions })}\n\n`);
+        res.end();
+
+        await this.prisma.chatbotLog.create({
+            data: { userId, question: message, answer: fallbackResponse + ' (Fallback)' },
+        });
+        return;
       }
 
       let fullResponse = '';
